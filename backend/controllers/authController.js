@@ -62,11 +62,11 @@ exports.registerStudent = async (req, res) => {
 
     await Roadmap.create({
       userId: newUser._id,
-      track: trackName,
-      startDate: today,
-      endDate: oneMonthFromNow,
-      modules: sampleModules,
-      dailyActivityLog: [] // Empty to begin with
+      track: chosenTrack || 'Undecided',
+      startDate: new Date(),
+      endDate: new Date(),
+      modules: [], // Start with an empty array so the dashboard knows they need to generate one
+      dailyActivityLog: []// Empty to begin with
     });
 
     // 5. Send back auth token and basic payload

@@ -73,5 +73,193 @@ router.post('/toggle-task', protect, async (req, res) => {
     res.status(500).json({ message: "Server error processing task status." });
   }
 });
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+// Initialize Gemini SDK
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// @route   POST /api/roadmap/generate
+// @desc    Generate a dynamic AI roadmap and save it to the database
+router.post('/generate', protect, async (req, res) => {
+  const { track, daysToComplete } = req.body;
+  const userId = req.user.id;
+
+  if (!track || !daysToComplete) {
+    return res.status(400).json({ message: "Please provide a track and timeframe." });
+  }
+
+  try {
+    const today = new Date();
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + parseInt(daysToComplete));
+
+    // 1. Construct the System Prompt
+    // We explicitly tell Gemini the exact JSON structure it MUST return.
+    const prompt = `
+      You are an expert Computer Science tutor. Create a highly structured learning roadmap for a student who wants to learn "${track}" in exactly ${daysToComplete} days.
+      The current start date is ${today.toISOString().split('T')[0]}.
+      Distribute the workload logically across the timeframe. 
+
+      Return ONLY a raw JSON array. Do not include markdown formatting or backticks like \`\`\`json.
+      
+      The JSON array must exactly match this structure:
+      [
+        {
+          "moduleName": "Name of the Module (e.g., Fundamentals)",
+          "tasks": [
+            {
+              "taskId": "a_unique_string_id",
+              "title": "Specific actionable task (e.g., Build a layout with Flexbox)",
+              "dueDate": "YYYY-MM-DDT00:00:00.000Z" // Must be a valid ISO date within the timeframe
+            }
+          ]
+        }
+      ]
+    `;
+
+    // 2. Call the Gemini API natively enforcing JSON output
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-3.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+      }
+    });
+
+    let result;
+    let maxRetries = 3;
+    let delay = 2000; // Start with a 2-second delay
+
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        // Attempt the API call
+        result = await model.generateContent(prompt);
+        break; // If successful, break out of the retry loop instantly
+      } catch (err) {
+        // If it's a 503 Service Unavailable, and we still have retries left
+        if (err.message.includes('503') && i < maxRetries - 1) {
+          console.log(`⚠️ Gemini API busy. Retrying in ${delay / 1000} seconds... (Attempt ${i + 1} of ${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2; // Double the wait time for the next attempt (Exponential Backoff)
+        } else {
+          // If it's a different error (like a 404), or we ran out of retries, throw it to the main catch block
+          throw err;
+        }
+      }
+    }
+
+    let generatedJSON = result.response.text();
+    generatedJSON = generatedJSON.replace(/```json/g, '').replace(/```/g, '').trim();
+    const modules = JSON.parse(generatedJSON);
+
+    // 3. Update or Replace the User's Roadmap in MongoDB
+    // If they already have a roadmap, we overwrite it. If not, we create it.
+    let roadmap = await Roadmap.findOne({ userId });
+
+    if (roadmap) {
+      roadmap.track = track;
+      roadmap.startDate = today;
+      roadmap.endDate = endDate;
+      roadmap.modules = modules;
+      roadmap.dailyActivityLog = []; // Reset activity grid for the new track
+      await roadmap.save();
+    } else {
+      roadmap = await Roadmap.create({
+        userId,
+        track,
+        startDate: today,
+        endDate: endDate,
+        modules,
+        dailyActivityLog: []
+      });
+    }
+
+    res.status(201).json(roadmap);
+
+  } catch (error) {
+    console.error("🔥 Detailed Backend Error:", error.message);
+    res.status(500).json({ message: "Failed to generate AI roadmap." });
+  }
+});
+
+// @route   POST /api/roadmap/recalculate
+// @desc    Reschedule incomplete tasks starting from today
+router.post('/recalculate', protect, async (req, res) => {
+  const { newDaysToComplete } = req.body;
+  const userId = req.user.id;
+
+  if (!newDaysToComplete) {
+    return res.status(400).json({ message: "Please provide the new timeframe." });
+  }
+
+  try {
+    const roadmap = await Roadmap.findOne({ userId });
+    if (!roadmap || roadmap.modules.length === 0) {
+      return res.status(404).json({ message: "No active roadmap found to reschedule." });
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // 1. Construct the Adaptive Prompt
+    const prompt = `
+      You are an expert AI tutor. A student is learning "${roadmap.track}". 
+      They have fallen behind on their schedule. Today's date is ${todayStr}.
+      
+      Here is their current roadmap JSON:
+      ${JSON.stringify(roadmap.modules)}
+      
+      Your task:
+      1. Leave all tasks where "isCompleted" is true EXACTLY as they are. Do not change their dates.
+      2. For all tasks where "isCompleted" is false, reschedule their "dueDate" logically. 
+      3. The new schedule for incomplete tasks must start from ${todayStr} and span across the next ${newDaysToComplete} days.
+      4. Maintain the exact same JSON structure (an array of modules containing tasks).
+      
+      Return ONLY the raw JSON array. No markdown, no backticks.
+    `;
+
+    // 2. Setup the Model (Using 3.5 Flash for speed)
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-3.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+    });
+
+    // 3. The Exponential Backoff Retry Loop
+    let result;
+    let maxRetries = 3;
+    let delay = 2000;
+
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        result = await model.generateContent(prompt);
+        break; 
+      } catch (err) {
+        if (err.message.includes('503') && i < maxRetries - 1) {
+          console.log(`⚠️ Gemini API busy. Retrying recalculation in ${delay / 1000}s...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2; 
+        } else {
+          throw err;
+        }
+      }
+    }
+
+    let generatedJSON = result.response.text();
+    generatedJSON = generatedJSON.replace(/```json/g, '').replace(/```/g, '').trim();
+    const updatedModules = JSON.parse(generatedJSON);
+
+    // 4. Save the updated roadmap back to MongoDB
+    roadmap.modules = updatedModules;
+    // Optionally update the endDate based on the new timeframe
+    const newEndDate = new Date();
+    newEndDate.setDate(newEndDate.getDate() + parseInt(newDaysToComplete));
+    roadmap.endDate = newEndDate;
+    
+    await roadmap.save();
+
+    res.status(200).json(roadmap);
+
+  } catch (error) {
+    console.error("🔥 Recalculation Error:", error.message);
+    res.status(500).json({ message: "Failed to recalculate roadmap." });
+  }
+});
 module.exports = router;
