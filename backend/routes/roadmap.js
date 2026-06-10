@@ -98,25 +98,33 @@ router.post('/generate', protect, async (req, res) => {
     const prompt = `
       You are an expert Computer Science tutor. Create a highly structured learning roadmap for a student who wants to learn "${track}" in exactly ${daysToComplete} days.
       The current start date is ${today.toISOString().split('T')[0]}.
-      Distribute the workload logically across the timeframe. 
+      Distribute the workload logically across the timeframe.
 
-      Return ONLY a raw JSON array. Do not include markdown formatting or backticks like \`\`\`json.
-      
+      CRITICAL REQUIREMENT: For every single task, you MUST provide 1 to 2 high-quality, real, and active online learning resources. 
+      These can include official documentation, highly rated YouTube playlists, or free interactive tutorials (like MDN, freeCodeCamp, GeeksforGeeks, or W3Schools). Ensure the URLs are valid and directly related to the task topic.
+
+      Return ONLY a raw JSON array. Do not include markdown formatting or backticks.
+  
       The JSON array must exactly match this structure:
       [
         {
-          "moduleName": "Name of the Module (e.g., Fundamentals)",
+          "moduleName": "Name of the Module",
           "tasks": [
             {
               "taskId": "a_unique_string_id",
-              "title": "Specific actionable task (e.g., Build a layout with Flexbox)",
-              "dueDate": "YYYY-MM-DDT00:00:00.000Z" // Must be a valid ISO date within the timeframe
+              "title": "Specific actionable task",
+              "dueDate": "YYYY-MM-DDT00:00:00.000Z",
+              "resources": [
+                {
+                  "label": "Source Label (e.g., YouTube Playlist, Official Docs)",
+                  "url": "https://example.com/actual-learning-link"
+                }
+              ]
             }
           ]
         }
       ]
-    `;
-
+      `;
     // 2. Call the Gemini API natively enforcing JSON output
     const model = genAI.getGenerativeModel({ 
       model: "gemini-3.5-flash",
