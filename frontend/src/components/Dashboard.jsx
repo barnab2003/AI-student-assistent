@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { ActivityCalendar } from 'react-activity-calendar';
-import { CheckCircle, Circle, Flame, Trophy, Sparkles, Loader2 } from 'lucide-react';
 import { io } from 'socket.io-client';
-
+import { CheckCircle, Circle, Flame, Trophy, Sparkles, Loader2, Search, Edit2, Camera } from 'lucide-react';
 const Dashboard = () => {
   // --- 1. STATE VARIABLES ---
   const [roadmap, setRoadmap] = useState(null);
@@ -22,6 +21,12 @@ const Dashboard = () => {
   const [imageFile, setImageFile] = useState(null);
   const [editingPostId, setEditingPostId] = useState(null);
   const [editPostText, setEditPostText] = useState('');
+  
+  // New Feature States
+  const [showGenerator, setShowGenerator] = useState(false); // For Roadmap regeneration
+  const [searchQuery, setSearchQuery] = useState(''); // For Community Search
+  const [isEditingProfile, setIsEditingProfile] = useState(false); // For Profile Editor
+  const [editProfileData, setEditProfileData] = useState({ username: '', file: null });
   // --- 2. INITIAL DATA FETCH ---
   useEffect(() => {
     fetchDashboardData();
@@ -116,6 +121,45 @@ const Dashboard = () => {
       alert("Failed to generate roadmap. Please try again.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+  
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    try {
+      let uploadedImageUrl = user.profilePicture || ""; 
+      
+      // 1. Try to upload the image
+      if (editProfileData.file) {
+        console.log("Step 1: Uploading image to server...");
+        const formData = new FormData();
+        formData.append('image', editProfileData.file);
+        
+        const uploadRes = await api.post('/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        console.log("Upload Success! Image URL:", uploadRes.data.imageUrl);
+        uploadedImageUrl = uploadRes.data.imageUrl;
+      }
+
+      // 2. Try to save the new data to the database
+      console.log("Step 2: Saving profile to database...");
+      const res = await api.put('/auth/profile', {
+        username: editProfileData.username || user.username,
+        profilePicture: uploadedImageUrl
+      });
+
+      // 3. Update the UI
+      console.log("Step 3: Profile updated successfully!");
+      setUser(res.data);
+      localStorage.setItem('user', JSON.stringify(res.data));
+      setIsEditingProfile(false);
+      fetchPosts(); 
+      
+    } catch (err) { 
+      console.error("FULL ERROR:", err);
+      // This will pop up a box on your screen telling us exactly what failed!
+      alert("Save Failed: " + (err.response?.data?.message || err.message)); 
     }
   };
 
@@ -220,15 +264,44 @@ const Dashboard = () => {
       {/* Dynamic Core Views Wrapper */}
       <div className="max-w-6xl mx-auto p-6 mt-4">
         
-        {/* 🏠 TAB 1: HOME PANEL */}
+{/* 🏠 TAB 1: HOME PANEL */}
         {activeTab === 'home' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* User Stats Widget */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-2xl mb-4">
-                Lvl {user?.level || 1}
-              </div>
-              <h3 className="text-xl font-bold text-gray-800">{user?.username}</h3>
+            {/* User Stats & Profile Widget */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center relative">
+              
+              {!isEditingProfile ? (
+                <>
+                  <button onClick={() => { setEditProfileData({ username: user?.username, file: null }); setIsEditingProfile(true); }} className="absolute top-4 right-4 text-gray-400 hover:text-blue-600">
+                    <Edit2 size={18} />
+                  </button>
+                  <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-3xl mb-4 overflow-hidden border-4 border-blue-50">
+                    {user?.profilePicture ? <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" /> : user?.username?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full mb-2">Level {user?.level || 1}</div>
+                  <h3 className="text-xl font-bold text-gray-800">{user?.username}</h3>
+                </>
+              ) : (
+                <form onSubmit={handleUpdateProfile} className="w-full space-y-4 text-center">
+                  <div className="relative w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-300">
+                    {editProfileData.file ? (
+                      <img src={URL.createObjectURL(editProfileData.file)} alt="Preview" className="w-full h-full object-cover" />
+                    ) : user?.profilePicture ? (
+                      <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <Camera className="text-gray-400" size={32} />
+                    )}
+                    <input type="file" accept="image/*" onChange={(e) => setEditProfileData({...editProfileData, file: e.target.files[0]})} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  </div>
+                  <p className="text-xs text-gray-500">Tap to change picture</p>
+                  <input type="text" value={editProfileData.username} onChange={(e) => setEditProfileData({...editProfileData, username: e.target.value})} className="w-full p-2 border rounded-lg text-center" placeholder="New Username" required />
+                  <div className="flex space-x-2 justify-center">
+                    <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-bold">Save</button>
+                    <button type="button" onClick={() => setIsEditingProfile(false)} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold">Cancel</button>
+                  </div>
+                </form>
+              )}
+
               <div className="flex w-full justify-between mt-6 px-4">
                 <div className="text-center">
                   <Trophy className="mx-auto text-yellow-500 mb-1" size={20} />
@@ -302,14 +375,14 @@ const Dashboard = () => {
               <div className="space-y-6">
                 <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                   <h1 className="text-2xl font-bold text-gray-800">Your {roadmap.track} Roadmap</h1>
-                  <button 
-                    onClick={handleRecalculate}
-                    disabled={isRecalculating}
-                    className="flex items-center text-sm font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
-                  >
-                    {isRecalculating ? <Loader2 className="animate-spin mr-2" size={16} /> : <Sparkles className="mr-2" size={16} />}
-                    {isRecalculating ? "Re-routing..." : "Re-route Plan"}
-                  </button>
+                  <div className="flex space-x-2">
+                    <button onClick={() => setShowGenerator(true)} className="flex items-center text-sm font-semibold bg-gray-100 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                       New Roadmap
+                    </button>
+                    <button onClick={handleRecalculate} disabled={isRecalculating} className="flex items-center text-sm font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
+                      {isRecalculating ? <Loader2 className="animate-spin mr-2" size={16} /> : <Sparkles className="mr-2" size={16} />} Re-route
+                    </button>
+                  </div>
                 </div>
 
                 {roadmap.modules.map((mod, idx) => (
@@ -377,10 +450,23 @@ const Dashboard = () => {
                 </button>
               </div>
             </form>
-
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+              <input 
+                type="text" 
+                placeholder="Search posts or usernames..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full p-3 pl-10 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 bg-white shadow-sm"
+              />
+            </div>
             {/* Render The Community Social Feed */}
             <div className="space-y-4">
-              {posts.map((post) => (
+              {posts.filter(post => 
+                post.text.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                post.username.toLowerCase().includes(searchQuery.toLowerCase())
+              ).map((post) => (
                 <div key={post._id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-4">
                   
                   {/* Top Row: User Info & Actions */}
