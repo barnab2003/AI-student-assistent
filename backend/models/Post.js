@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const CommentSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   username: { type: String, required: true },
+  userProfilePicture: { type: String, default: "" }, // <--- NEW
   text: { type: String, required: true }
 }, { timestamps: true });
 
@@ -12,6 +13,7 @@ const PostSchema = new mongoose.Schema({
   userLevel: { type: Number, default: 1 },
   text: { type: String, required: true },
   mediaUrl: { type: String, default: null }, // For pictures/links
+  userProfilePicture: { type: String, default: "" }, // <--- NEW
   linkUrl: { type: String, default: null },
   comments: [CommentSchema]
 }, { timestamps: true });

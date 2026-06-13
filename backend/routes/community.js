@@ -25,6 +25,7 @@ router.post('/post', protect, async (req, res) => {
       userId: user._id,
       username: user.username,
       userLevel: user.level,
+      userProfilePicture: user.profilePicture,
       text, mediaUrl, linkUrl
     });
     

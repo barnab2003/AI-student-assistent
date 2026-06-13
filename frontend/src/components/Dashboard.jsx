@@ -3,6 +3,11 @@ import api from '../api/axios';
 import { ActivityCalendar } from 'react-activity-calendar';
 import { io } from 'socket.io-client';
 import { CheckCircle, Circle, Flame, Trophy, Sparkles, Loader2, Search, Edit2, Camera } from 'lucide-react';
+import Navbar from './dashboard/Navbar';
+import HomeTab from './dashboard/HomeTab';
+import RoadmapTab from './dashboard/RoadmapTab'; // <--- NEW IMPORT
+import CommunityTab from './dashboard/CommunityTab';
+
 const Dashboard = () => {
   // --- 1. STATE VARIABLES ---
   const [roadmap, setRoadmap] = useState(null);
@@ -235,314 +240,62 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-12">
-      {/* Global Header / Navigation Bar */}
-      <nav className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 flex justify-between items-center h-16">
-          <div className="flex items-center space-x-2 font-bold text-xl text-blue-600">
-            <span>🚀 SmartStudy.cs</span>
-          </div>
-          
-          {/* Navigation Tabs */}
-          <div className="flex space-x-1">
-            {['home', 'roadmap', 'community'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm capitalize transition-all ${
-                  activeTab === tab 
-                    ? 'bg-blue-600 text-white shadow-sm' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
-
+      
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* Dynamic Core Views Wrapper */}
       <div className="max-w-6xl mx-auto p-6 mt-4">
         
 {/* 🏠 TAB 1: HOME PANEL */}
+        {/* 2. Injected Home Tab Component */}
         {activeTab === 'home' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* User Stats & Profile Widget */}
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center relative">
-              
-              {!isEditingProfile ? (
-                <>
-                  <button onClick={() => { setEditProfileData({ username: user?.username, file: null }); setIsEditingProfile(true); }} className="absolute top-4 right-4 text-gray-400 hover:text-blue-600">
-                    <Edit2 size={18} />
-                  </button>
-                  <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-3xl mb-4 overflow-hidden border-4 border-blue-50">
-                    {user?.profilePicture ? <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" /> : user?.username?.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full mb-2">Level {user?.level || 1}</div>
-                  <h3 className="text-xl font-bold text-gray-800">{user?.username}</h3>
-                </>
-              ) : (
-                <form onSubmit={handleUpdateProfile} className="w-full space-y-4 text-center">
-                  <div className="relative w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-300">
-                    {editProfileData.file ? (
-                      <img src={URL.createObjectURL(editProfileData.file)} alt="Preview" className="w-full h-full object-cover" />
-                    ) : user?.profilePicture ? (
-                      <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <Camera className="text-gray-400" size={32} />
-                    )}
-                    <input type="file" accept="image/*" onChange={(e) => setEditProfileData({...editProfileData, file: e.target.files[0]})} className="absolute inset-0 opacity-0 cursor-pointer" />
-                  </div>
-                  <p className="text-xs text-gray-500">Tap to change picture</p>
-                  <input type="text" value={editProfileData.username} onChange={(e) => setEditProfileData({...editProfileData, username: e.target.value})} className="w-full p-2 border rounded-lg text-center" placeholder="New Username" required />
-                  <div className="flex space-x-2 justify-center">
-                    <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-bold">Save</button>
-                    <button type="button" onClick={() => setIsEditingProfile(false)} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold">Cancel</button>
-                  </div>
-                </form>
-              )}
-
-              <div className="flex w-full justify-between mt-6 px-4">
-                <div className="text-center">
-                  <Trophy className="mx-auto text-yellow-500 mb-1" size={20} />
-                  <p className="text-xs text-gray-500 uppercase font-bold">Total XP</p>
-                  <p className="font-semibold text-lg">{user?.xp || 0}</p>
-                </div>
-                <div className="text-center">
-                  <Flame className="mx-auto text-orange-500 mb-1" size={20} />
-                  <p className="text-xs text-gray-500 uppercase font-bold">Streak</p>
-                  <p className="font-semibold text-lg">{user?.streak || 0} Days</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Activity Logs Analytics Grid */}
-            <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
-              <h3 className="text-sm font-bold text-gray-500 uppercase mb-4 tracking-wider">Activity History Calendar</h3>
-              <ActivityCalendar 
-                data={roadmap?.dailyActivityLog?.length > 0 ? roadmap.dailyActivityLog : [{ date: new Date().toISOString().split('T')[0], count: 0, level: 0 }]} 
-                theme={{ light: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'] }}
-                hideColorLegend
-              />
-            </div>
-          </div>
+          <HomeTab 
+            user={user} 
+            roadmap={roadmap}
+            isEditingProfile={isEditingProfile}
+            setIsEditingProfile={setIsEditingProfile}
+            editProfileData={editProfileData}
+            setEditProfileData={setEditProfileData}
+            handleUpdateProfile={handleUpdateProfile}
+          />
         )}
 
         {/* 🗺️ TAB 2: ROADMAP PANEL */}
         {activeTab === 'roadmap' && (
-          <div className="max-w-4xl mx-auto">
-            
-            {/* Conditional: Do they need a roadmap, or do they already have one? */}
-            {!roadmap || roadmap?.modules?.length === 0 ? (
-              
-              /* --- THE GENERATOR FORM --- */
-              <div className="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 text-center mt-4">
-                <Sparkles className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Design Your AI Learning Path</h1>
-                <p className="text-gray-500 mb-8">Tell us what you want to master, and our AI will build a day-by-day curriculum for you.</p>
-                
-                <form onSubmit={handleGenerateAI} className="space-y-6 text-left max-w-xl mx-auto">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">What do you want to learn?</label>
-                    <input 
-                      type="text" required placeholder="e.g., Python for Data Science, Advanced React..."
-                      className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                      value={genParams.track}
-                      onChange={(e) => setGenParams({...genParams, track: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">In how many days?</label>
-                    <input 
-                      type="number" required min="7" max="180"
-                      className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-                      value={genParams.daysToComplete}
-                      onChange={(e) => setGenParams({...genParams, daysToComplete: e.target.value})}
-                    />
-                  </div>
-                  <button 
-                    type="submit" disabled={isGenerating}
-                    className="w-full flex items-center justify-center bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
-                  >
-                    {isGenerating ? <Loader2 className="animate-spin mr-2" size={20} /> : 'Generate My Roadmap'}
-                  </button>
-                </form>
-              </div>
-
-            ) : (
-
-              /* --- THE ACTUAL ROADMAP CHECKLIST --- */
-              <div className="space-y-6">
-                <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                  <h1 className="text-2xl font-bold text-gray-800">Your {roadmap.track} Roadmap</h1>
-                  <div className="flex space-x-2">
-                    <button onClick={() => setShowGenerator(true)} className="flex items-center text-sm font-semibold bg-gray-100 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-                       New Roadmap
-                    </button>
-                    <button onClick={handleRecalculate} disabled={isRecalculating} className="flex items-center text-sm font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
-                      {isRecalculating ? <Loader2 className="animate-spin mr-2" size={16} /> : <Sparkles className="mr-2" size={16} />} Re-route
-                    </button>
-                  </div>
-                </div>
-
-                {roadmap.modules.map((mod, idx) => (
-                  <div key={idx} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">{mod.moduleName}</h2>
-                    <ul className="space-y-3">
-                      {mod.tasks.map((task) => (
-                        <li 
-                          key={task.taskId} 
-                          className={`flex flex-col p-4 rounded-lg cursor-pointer transition-colors ${task.isCompleted ? 'bg-green-50' : 'hover:bg-gray-50'}`}
-                          onClick={() => handleToggleTask(task.taskId, mod.moduleName)}
-                        >
-                          <div className="flex items-center w-full">
-                            {task.isCompleted ? <CheckCircle className="text-green-500 mr-3 flex-shrink-0" size={24} /> : <Circle className="text-gray-300 mr-3 flex-shrink-0" size={24} />}
-                            <span className={`flex-1 text-lg ${task.isCompleted ? 'line-through text-gray-400' : 'text-gray-700'}`}>{task.title}</span>
-                            <span className="text-sm text-gray-400">Due: {new Date(task.dueDate).toLocaleDateString()}</span>
-                          </div>
-
-                          {/* Resource Badges */}
-                          {task.resources && task.resources.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2 ml-9" onClick={(e) => e.stopPropagation()}>
-                              {task.resources.map((res, rIdx) => (
-                                <a
-                                  key={rIdx} href={res.url} target="_blank" rel="noopener noreferrer"
-                                  className="inline-flex items-center text-xs font-semibold bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-2.5 py-1 rounded-md border border-gray-200 transition-colors"
-                                >
-                                  <span className="mr-1">📚</span> {res.label}
-                                </a>
-                              ))}
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <RoadmapTab 
+            roadmap={roadmap}
+            showGenerator={showGenerator}
+            setShowGenerator={setShowGenerator}
+            isGenerating={isGenerating}
+            genParams={genParams}
+            setGenParams={setGenParams}
+            handleGenerateAI={handleGenerateAI}
+            isRecalculating={isRecalculating}
+            handleRecalculate={handleRecalculate}
+            handleToggleTask={handleToggleTask}
+          />
         )}
 
         {/* 👥 TAB 3: COMMUNITY PANEL */}
         {activeTab === 'community' && (
-          <div className="max-w-3xl mx-auto space-y-6">
-            
-            {/* Create Post Interface Card */}
-            <form onSubmit={handleCreatePost} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3">
-              <textarea
-                className="w-full p-3 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 outline-none text-gray-700"
-                rows="3"
-                placeholder="Share an insight, question, link, or progress picture..."
-                value={newPostText}
-                onChange={(e) => setNewPostText(e.target.value)}
-              />
-              <div className="flex justify-between items-center">
-                {/* Image Upload Input */}
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={(e) => setImageFile(e.target.files[0])} 
-                  className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
-                />
-                <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 transition-all">
-                  Publish Post
-                </button>
-              </div>
-            </form>
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-              <input 
-                type="text" 
-                placeholder="Search posts or usernames..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-3 pl-10 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 bg-white shadow-sm"
-              />
-            </div>
-            {/* Render The Community Social Feed */}
-            <div className="space-y-4">
-              {posts.filter(post => 
-                post.text.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                post.username.toLowerCase().includes(searchQuery.toLowerCase())
-              ).map((post) => (
-                <div key={post._id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-4">
-                  
-                  {/* Top Row: User Info & Actions */}
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-sm border border-blue-100">
-                        Lvl {post.userLevel}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-800">@{post.username}</h4>
-                        <p className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    
-                    {/* Edit/Delete Dropdown logic (Only show if current user owns post) */}
-                    {user && (user.id === post.userId || user._id === post.userId) && (
-                      <div className="space-x-2 flex">
-                        <button onClick={() => { setEditingPostId(post._id); setEditPostText(post.text); }} className="text-xs font-semibold text-gray-400 hover:text-blue-600 transition-colors">Edit</button>
-                        <button onClick={() => handleDeletePost(post._id)} className="text-xs font-semibold text-gray-400 hover:text-red-600 transition-colors">Delete</button>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Edit Mode vs Normal View */}
-                  {editingPostId === post._id ? (
-                    <div className="space-y-2">
-                      <textarea 
-                        className="w-full p-3 border border-blue-300 rounded outline-none focus:ring-2 focus:ring-blue-500" 
-                        value={editPostText} 
-                        onChange={(e) => setEditPostText(e.target.value)} 
-                        rows="3"
-                      />
-                      <div className="space-x-2">
-                        <button onClick={() => submitEditPost(post._id)} className="text-xs font-bold bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">Save Changes</button>
-                        <button onClick={() => setEditingPostId(null)} className="text-xs font-bold bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition-colors">Cancel</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-gray-700 text-md leading-relaxed">{post.text}</p>
-                  )}
-
-                  {/* Render Image if it exists */}
-                  {post.mediaUrl && (
-                    <img src={post.mediaUrl} alt="Post attachment" className="rounded-lg max-h-96 w-full object-cover border border-gray-100 mt-2" />
-                  )}
-                  
-                  {/* Embedded Threaded Comments Section */}
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-3 border border-gray-100 mt-4">
-                    <h5 className="text-xs font-bold text-gray-500 uppercase tracking-wide">Discussion Thread</h5>
-                    
-                    {post.comments && post.comments.map((comment, cIdx) => (
-                      <div key={cIdx} className="text-sm border-l-2 border-gray-200 pl-3 py-1">
-                        <span className="font-bold text-gray-800">@{comment.username}: </span>
-                        <span className="text-gray-600">{comment.text}</span>
-                      </div>
-                    ))}
-                    
-                    {/* Inline Comment Form */}
-                    <div className="flex gap-2 pt-2">
-                      <input
-                        type="text"
-                        className="flex-1 p-2 border border-gray-200 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="Write a comment..."
-                        value={newCommentText[post._id] || ''}
-                        onChange={(e) => setNewCommentText({ ...newCommentText, [post._id]: e.target.value })}
-                      />
-                      <button onClick={() => handleCreateComment(post._id)} className="bg-white border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 px-4 py-2 rounded-md font-bold text-xs text-gray-600 transition-colors">
-                        Reply
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-              ))}
-            </div>
-          </div>
+          <CommunityTab
+            user={user}
+            posts={posts}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            handleCreatePost={handleCreatePost}
+            newPostText={newPostText}
+            setNewPostText={setNewPostText}
+            setImageFile={setImageFile}
+            editingPostId={editingPostId}
+            setEditingPostId={setEditingPostId}
+            editPostText={editPostText}
+            setEditPostText={setEditPostText}
+            submitEditPost={submitEditPost}
+            handleDeletePost={handleDeletePost}
+            newCommentText={newCommentText}
+            setNewCommentText={setNewCommentText}
+            handleCreateComment={handleCreateComment}
+          />
         )}
 
       </div>

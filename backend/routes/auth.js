@@ -3,6 +3,7 @@ const router = express.Router();
 const { registerStudent, loginStudent, getMe } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const Post = require('../models/Post'); // Add this near your other imports
+const User = require('../models/User'); // <--- ADD THIS EXACT LINE
 // Public Onboarding Paths
 router.post('/register', registerStudent);
 router.post('/login', loginStudent);
@@ -21,7 +22,7 @@ router.put('/profile', protect, async (req, res) => {
     // Update all their existing posts with the new username
     await Post.updateMany(
       { userId: user._id },
-      { $set: { username: user.username } }
+      { $set: { username: user.username, userProfilePicture: user.profilePicture } }
     );
 
     res.json({
