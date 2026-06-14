@@ -18,27 +18,29 @@ const RoadmapTab = ({
       {/* Conditional: Do they need a roadmap, or do they already have one? */}
       {!roadmap || roadmap?.modules?.length === 0 || showGenerator ? (
         
-        /* --- THE GENERATOR FORM --- */
-        <div className="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 text-center mt-4">
-          <Sparkles className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Design Your AI Learning Path</h1>
-          <p className="text-gray-500 mb-8">Tell us what you want to master, and our AI will build a day-by-day curriculum for you.</p>
+        /* --- THE GENERATOR FORM (Brutalist Redesign) --- */
+        <div className="p-10 bg-white rounded-[2rem] border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] text-center mt-4">
+          <div className="w-20 h-20 bg-[#B9FF66] border-2 border-black rounded-full flex items-center justify-center mx-auto mb-6 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+            <Sparkles className="w-10 h-10 text-black" />
+          </div>
+          <h1 className="text-4xl font-black text-black mb-3 tracking-tight">Design Your AI Learning Path</h1>
+          <p className="text-gray-600 font-medium mb-10 max-w-lg mx-auto">Tell us what you want to master, and our AI will build a custom day-by-day curriculum for you.</p>
           
           <form onSubmit={handleGenerateAI} className="space-y-6 text-left max-w-xl mx-auto">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">What do you want to learn?</label>
+              <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">What do you want to learn?</label>
               <input 
                 type="text" required placeholder="e.g., Python for Data Science, Advanced React..."
-                className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-4 border-2 border-black rounded-xl outline-none focus:ring-4 focus:ring-[#B9FF66] text-black font-medium transition-all"
                 value={genParams.track}
                 onChange={(e) => setGenParams({...genParams, track: e.target.value})}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">In how many days?</label>
+              <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">In how many days?</label>
               <input 
                 type="number" required min="7" max="180"
-                className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-4 border-2 border-black rounded-xl outline-none focus:ring-4 focus:ring-[#B9FF66] text-black font-medium transition-all"
                 value={genParams.daysToComplete}
                 onChange={(e) => setGenParams({...genParams, daysToComplete: e.target.value})}
               />
@@ -46,17 +48,17 @@ const RoadmapTab = ({
             
             <button 
               type="submit" disabled={isGenerating}
-              className="w-full flex items-center justify-center bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+              className="w-full flex items-center justify-center bg-[#B9FF66] text-black border-2 border-black font-black text-lg py-4 rounded-xl shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)] disabled:bg-gray-200 disabled:shadow-none transition-all"
             >
-              {isGenerating ? <Loader2 className="animate-spin mr-2" size={20} /> : 'Generate My Roadmap'}
+              {isGenerating ? <Loader2 className="animate-spin mr-2" size={24} /> : 'Generate My Roadmap'}
             </button>
 
-            {/* Cancel button: Only show if they already have a roadmap and are just trying to make a new one */}
+            {/* Cancel button */}
             {roadmap?.modules?.length > 0 && (
               <button 
                 type="button" 
                 onClick={() => setShowGenerator(false)}
-                className="w-full flex items-center justify-center bg-gray-100 text-gray-600 font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors mt-2"
+                className="w-full flex items-center justify-center bg-white text-black border-2 border-black font-black py-4 rounded-xl hover:bg-gray-50 transition-all mt-4"
               >
                 Cancel
               </button>
@@ -66,45 +68,67 @@ const RoadmapTab = ({
 
       ) : (
 
-        /* --- THE ACTUAL ROADMAP CHECKLIST --- */
-        <div className="space-y-6">
-          <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-            <h1 className="text-2xl font-bold text-gray-800">Your {roadmap.track} Roadmap</h1>
-            <div className="flex space-x-2">
-              <button onClick={() => setShowGenerator(true)} className="flex items-center text-sm font-semibold bg-gray-100 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+        /* --- THE ACTUAL ROADMAP CHECKLIST (Brutalist Redesign) --- */
+        <div className="space-y-8">
+          
+          {/* Main Roadmap Header */}
+          {/* Main Roadmap Header (Responsive Redesign) */}
+          <div className="flex flex-col md:flex-row flex-wrap justify-between items-start md:items-center gap-6 bg-[#191A23] p-6 md:p-8 rounded-[2rem] border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] text-white">
+            
+            {/* Title with flex-1 and break-words so it doesn't push buttons out */}
+            <h1 className="text-2xl md:text-3xl font-black flex-1 min-w-0 break-words">
+              <span className="text-[#B9FF66]">Your</span> {roadmap.track} <span className="text-[#B9FF66]">Roadmap</span>
+            </h1>
+            
+            {/* Button container with flex-wrap and shrink-0 */}
+            <div className="flex flex-wrap gap-3 w-full md:w-auto shrink-0">
+              <button onClick={() => setShowGenerator(true)} className="flex-1 md:flex-none justify-center flex items-center text-sm font-bold bg-white text-black border-2 border-black px-5 py-2.5 rounded-xl shadow-[2px_2px_0px_rgba(185,255,102,1)] hover:translate-y-[2px] hover:shadow-none transition-all">
                 New Roadmap
               </button>
-              <button onClick={handleRecalculate} disabled={isRecalculating} className="flex items-center text-sm font-semibold bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
+              <button onClick={handleRecalculate} disabled={isRecalculating} className="flex-1 md:flex-none justify-center flex items-center text-sm font-bold bg-[#B9FF66] text-black border-2 border-black px-5 py-2.5 rounded-xl shadow-[2px_2px_0px_rgba(255,255,255,1)] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 transition-all">
                 {isRecalculating ? <Loader2 className="animate-spin mr-2" size={16} /> : <Sparkles className="mr-2" size={16} />} Re-route
               </button>
             </div>
+            
           </div>
 
+          {/* Modules Array */}
           {roadmap.modules.map((mod, idx) => (
-            <div key={idx} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-              <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">{mod.moduleName}</h2>
-              <ul className="space-y-3">
+            <div key={idx} className="bg-[#191A23] p-6 md:p-8 rounded-[2rem] border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)]">
+              <h2 className="text-2xl font-black mb-6 text-[#B9FF66] border-b-4 border-black pb-3 inline-block">{mod.moduleName}</h2>
+              <ul className="space-y-4">
                 {mod.tasks.map((task) => (
                   <li 
                     key={task.taskId} 
-                    className={`flex flex-col p-4 rounded-lg cursor-pointer transition-colors ${task.isCompleted ? 'bg-green-50' : 'hover:bg-gray-50'}`}
+                    className={`flex flex-col p-5 rounded-2xl cursor-pointer border-2 transition-all ${
+                      task.isCompleted 
+                        ? 'bg-[#B9FF66] border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] scale-[1.01]' 
+                        : 'bg-white border-black hover:bg-gray-50 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_rgba(0,0,0,1)]'
+                    }`}
                     onClick={() => handleToggleTask(task.taskId, mod.moduleName)}
                   >
-                    <div className="flex items-center w-full">
-                      {task.isCompleted ? <CheckCircle className="text-green-500 mr-3 flex-shrink-0" size={24} /> : <Circle className="text-gray-300 mr-3 flex-shrink-0" size={24} />}
-                      <span className={`flex-1 text-lg ${task.isCompleted ? 'line-through text-gray-400' : 'text-gray-700'}`}>{task.title}</span>
-                      <span className="text-sm text-gray-400">Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                    <div className="flex items-start md:items-center w-full">
+                      {task.isCompleted ? <CheckCircle className="text-black mr-4 flex-shrink-0 mt-1 md:mt-0" size={28} /> : <Circle className="text-gray-400 mr-4 flex-shrink-0 mt-1 md:mt-0" size={28} />}
+                      
+                      <div className="flex-1">
+                        <span className={`block text-lg font-bold ${task.isCompleted ? 'line-through text-black/60' : 'text-black'}`}>
+                          {task.title}
+                        </span>
+                        <span className={`text-sm font-bold mt-1 inline-block px-2 py-0.5 rounded-md border ${task.isCompleted ? 'bg-black text-[#B9FF66] border-black' : 'bg-gray-100 text-gray-500 border-gray-300'}`}>
+                          Due: {new Date(task.dueDate).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Resource Badges */}
                     {task.resources && task.resources.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2 ml-9" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex flex-wrap gap-2 mt-4 md:ml-11" onClick={(e) => e.stopPropagation()}>
                         {task.resources.map((res, rIdx) => (
                           <a
                             key={rIdx} href={res.url} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center text-xs font-semibold bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-2.5 py-1 rounded-md border border-gray-200 transition-colors"
+                            className="inline-flex items-center text-xs font-bold bg-[#191A23] text-white hover:text-[#B9FF66] px-3 py-1.5 rounded-lg border-2 border-black transition-colors"
                           >
-                            <span className="mr-1">📚</span> {res.label}
+                            <span className="mr-1.5">📚</span> {res.label}
                           </a>
                         ))}
                       </div>

@@ -1,152 +1,167 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';
-import { Code2, Terminal, Cpu } from 'lucide-react';
+import logo from '../assets/logo.png'; 
+import axios from 'axios'; // Adjust this if you use standard axios! e.g., import axios from 'axios';
 
 const Auth = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    password: '',
-    chosenTrack: 'Web Development'
+    password: ''
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     setError('');
-    setLoading(true);
 
     try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/register';
-      const payload = isLogin 
-        ? { email: formData.email, password: formData.password }
-        : formData;
+      if (isLogin) {
+        // LOGIN LOGIC
+        const res = await axios.post('http://localhost:5000/api/auth/login', { 
+          email: formData.email, 
+          password: formData.password 
+        });
+        
+        // Save auth data and redirect
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        navigate('/dashboard');
 
-      const response = await api.post(endpoint, payload);
-
-      // Save credentials and redirect
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      navigate('/dashboard');
+      } else {
+        // REGISTER LOGIC
+        const res = await axios.post('http://localhost:5000/api/auth/register', { 
+          username: formData.username, 
+          email: formData.email, 
+          password: formData.password 
+        });
+        
+        // Save auth data and redirect
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        navigate('/dashboard');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred. Please try again.');
+      console.error("Auth Error:", err);
+      setError(err.response?.data?.message || 'Authentication failed. Please try again.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-white p-6 font-sans">
+      
+      {/* Brutalist Auth Card */}
+      <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-[2rem] border-4 border-black shadow-[12px_12px_0px_rgba(0,0,0,1)]">
+        
+        {/* Logo / Header */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {isLogin ? 'Welcome Back' : 'Start Your Journey'}
-          </h2>
-          <p className="text-gray-500 mt-2">
-            {isLogin ? 'Log in to continue your learning roadmap.' : 'Create an account to generate your AI track.'}
+          <div className="flex justify-center items-center space-x-3 font-black text-3xl tracking-tight text-black mb-2">
+            <img 
+              src={logo} 
+              alt="SmartStudy Logo" 
+              className="h-14 w-auto " 
+            />
+            <span>10x.CS</span>
+          </div>
+          <p className="text-gray-600 font-bold uppercase tracking-widest text-sm mt-4">
+            {isLogin ? 'Welcome back.' : 'Start your journey.'}
           </p>
         </div>
 
+        {/* Auth Toggle Tabs */}
+        <div className="flex w-full mb-8 bg-gray-100 p-1.5 rounded-2xl border-2 border-black">
+          <button
+            type="button"
+            onClick={() => { setIsLogin(true); setError(''); }}
+            className={`flex-1 py-3 px-4 rounded-xl font-black text-sm transition-all ${
+              isLogin 
+                ? 'bg-[#B9FF66] text-black border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]' 
+                : 'text-gray-500 hover:text-black border-2 border-transparent'
+            }`}
+          >
+            Log In
+          </button>
+          <button
+            type="button"
+            onClick={() => { setIsLogin(false); setError(''); }}
+            className={`flex-1 py-3 px-4 rounded-xl font-black text-sm transition-all ${
+              !isLogin 
+                ? 'bg-[#B9FF66] text-black border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]' 
+                : 'text-gray-500 hover:text-black border-2 border-transparent'
+            }`}
+          >
+            Sign Up
+          </button>
+        </div>
+
+        {/* Error Message Display */}
         {error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded-lg mb-6 text-sm text-center">
+          <div className="mb-6 p-4 bg-red-100 border-2 border-black rounded-xl text-red-600 font-bold text-sm text-center shadow-[4px_4px_0px_rgba(0,0,0,1)]">
             {error}
           </div>
         )}
 
+        {/* The Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
+          
+          {/* Username Field (Only show if signing up) */}
           {!isLogin && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+              <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">Username</label>
               <input
                 type="text"
-                name="username"
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="coder_99"
-                onChange={handleChange}
+                placeholder="e.g. CodeNinja99"
+                className="w-full p-4 border-2 border-black rounded-xl outline-none focus:ring-4 focus:ring-[#B9FF66] text-black font-medium transition-all"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               />
             </div>
           )}
 
+          {/* Email Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">Email Address</label>
             <input
               type="email"
-              name="email"
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="student@university.edu"
-              onChange={handleChange}
+              placeholder="you@example.com"
+              className="w-full p-4 border-2 border-black rounded-xl outline-none focus:ring-4 focus:ring-[#B9FF66] text-black font-medium transition-all"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
 
+          {/* Password Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">Password</label>
             <input
               type="password"
-              name="password"
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="••••••••"
-              onChange={handleChange}
+              className="w-full p-4 border-2 border-black rounded-xl outline-none focus:ring-4 focus:ring-[#B9FF66] text-black font-medium transition-all"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
           </div>
 
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Your Track</label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {['Web Development', 'AI / ML', 'DevOps'].map((track) => (
-                  <div
-                    key={track}
-                    onClick={() => setFormData({ ...formData, chosenTrack: track })}
-                    className={`cursor-pointer border p-3 rounded-lg flex flex-col items-center text-center transition-all ${
-                      formData.chosenTrack === track 
-                        ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500' 
-                        : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                    }`}
-                  >
-                    {track === 'Web Development' && <Code2 size={24} className="mb-1" />}
-                    {track === 'AI / ML' && <Cpu size={24} className="mb-1" />}
-                    {track === 'DevOps' && <Terminal size={24} className="mb-1" />}
-                    <span className="text-xs font-semibold">{track}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
+          {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center bg-black text-[#B9FF66] border-2 border-black font-black text-lg py-4 mt-4 rounded-xl shadow-[6px_6px_0px_rgba(185,255,102,1)] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(185,255,102,1)] disabled:bg-gray-800 disabled:shadow-none transition-all"
           >
-            {loading ? 'Processing...' : (isLogin ? 'Log In' : 'Generate Roadmap')}
+            {isLoading ? <Loader2 className="animate-spin mr-2" size={24} /> : (isLogin ? 'Enter' : 'Create Account')}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <button
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError('');
-            }}
-            className="text-blue-600 font-bold hover:underline"
-          >
-            {isLogin ? 'Sign up' : 'Log in'}
-          </button>
-        </div>
       </div>
     </div>
   );
