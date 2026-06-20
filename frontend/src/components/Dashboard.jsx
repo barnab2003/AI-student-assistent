@@ -4,10 +4,12 @@ import { ActivityCalendar } from 'react-activity-calendar';
 import { io } from 'socket.io-client';
 import { CheckCircle, Circle, Flame, Trophy, Sparkles, Loader2, Search, Edit2, Camera } from 'lucide-react';
 import Navbar from './dashboard/Navbar';
+import Sidebar from './dashboard/Sidebar';
 import HomeTab from './dashboard/HomeTab';
 import RoadmapTab from './dashboard/RoadmapTab'; // <--- NEW IMPORT
 import CommunityTab from './dashboard/CommunityTab';
-
+import LeaderboardTab from './dashboard/LeaderboardTab';
+import QuizTab from './dashboard/QuizTab';
 const Dashboard = () => {
   // --- 1. STATE VARIABLES ---
   const [roadmap, setRoadmap] = useState(null);
@@ -19,6 +21,8 @@ const Dashboard = () => {
   const [isRecalculating, setIsRecalculating] = useState(false);
 
   const [activeTab, setActiveTab] = useState('home'); // 'home', 'roadmap', 'community'
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const [posts, setPosts] = useState([]);
   const [newPostText, setNewPostText] = useState('');
   const [newCommentText, setNewCommentText] = useState({});
@@ -241,9 +245,13 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-12">
       
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-      {/* Dynamic Core Views Wrapper */}
-      <div className="max-w-6xl mx-auto p-6 mt-4">
+      {/* 0. Injected Offcanvas Sidebar */}
+      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} setActiveTab={setActiveTab} />
+
+      {/* 1. Injected Navbar Component */}
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} toggleSidebar={toggleSidebar} />
+
+      <div className="max-w-6xl mx-auto p-4 sm:p-6 mt-4">
         
 {/* 🏠 TAB 1: HOME PANEL */}
         {/* 2. Injected Home Tab Component */}
@@ -298,6 +306,14 @@ const Dashboard = () => {
           />
         )}
 
+        {/* 🏆 TAB 4: LEADERBOARD PANEL */}
+        {activeTab === 'leaderboard' && (
+          <LeaderboardTab currentUser={user} />
+        )}
+        {/* 🧠 TAB 5: AI QUIZ PANEL */}
+        {activeTab === 'quizzes' && (
+          <QuizTab currentUser={user} />
+        )}
       </div>
     </div>
   );

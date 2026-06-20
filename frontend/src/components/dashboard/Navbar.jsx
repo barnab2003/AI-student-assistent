@@ -1,19 +1,27 @@
 import React from 'react';
+import { Menu } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
-const Navbar = ({ activeTab, setActiveTab }) => {
+const Navbar = ({ activeTab, setActiveTab, toggleSidebar }) => { // <--- ADD toggleSidebar HERE
   return (
     <nav className="bg-white border-b-2 border-black sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex justify-between items-center h-20">
         
-        {/* Brand Logo - Hides text on tiny screens */}
-        <div className="flex items-center space-x-3 font-black text-2xl tracking-tight text-black shrink-0">
-          <img 
-            src={logo} 
-            alt="SmartStudy Logo" 
-            className="h-8 sm:h-10 w-auto " 
-          />
-          <span className="hidden sm:block">10x.CS</span>
+        {/* Hamburger Menu & Brand Logo */}
+        <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
+          
+          <button onClick={toggleSidebar} className="p-2 sm:p-2.5 bg-white border-2 border-black rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer">
+            <Menu size={24} className="text-black" strokeWidth={2.5} />
+          </button>
+
+          <div className="flex items-center space-x-3 font-black text-2xl tracking-tight text-black cursor-pointer">
+            <img 
+              src={logo} 
+              alt="SmartStudy Logo" 
+              className="h-8 sm:h-10 w-auto" 
+            />
+            <span className="hidden sm:block">10x.CS</span>
+          </div>
         </div>
         
         {/* Navigation Tabs - Adds horizontal scroll for small screens */}

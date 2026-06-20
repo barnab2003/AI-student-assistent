@@ -270,4 +270,49 @@ router.post('/recalculate', protect, async (req, res) => {
     res.status(500).json({ message: "Failed to recalculate roadmap." });
   }
 });
+
+// @route   POST /api/roadmap/generate-quiz
+// @desc    Generate a 3-question AI quiz
+router.post('/generate-quiz', async (req, res) => {
+  try {
+    const { topic } = req.body;
+
+    const prompt = `
+      You are an expert computer science tutor. 
+      Create a 3-question multiple-choice quiz about "${topic}".
+      Return ONLY a strict JSON array of 3 objects. 
+      Do not wrap it in markdown blockquotes like \`\`\`json. 
+      Format exactly like this:
+      [
+        {
+          "question": "What does HTML stand for?",
+          "options": ["Hyper Text Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language", "Hyper Tool Multi Language"],
+          "correctAnswer": "Hyper Text Markup Language"
+        }
+      ]
+    `;
+
+    // 🐛 FIX 1: Initialize the Gemini model here!
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-3.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+    });
+
+    // Execute AI Call
+    const result = await model.generateContent(prompt);
+    let rawText = result.response.text();
+    
+    // Clean up any stray markdown formatting
+    rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    const quizJSON = JSON.parse(rawText);
+    
+    res.json({ quiz: quizJSON });
+
+  } catch (error) {
+    console.error("Quiz Gen Error:", error);
+    res.status(500).json({ error: "Failed to generate quiz." });
+  }
+});
+
 module.exports = router;
