@@ -48,6 +48,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar, setActiveTab }) => { // <--- AD
                   setActiveTab('quizzes');
                   toggleSidebar();
                 }
+                if (item.tabId === 'badges') {
+                  setActiveTab('badges');
+                  toggleSidebar();
+                }
               }}
               className="w-full flex items-center space-x-4 p-4 rounded-2xl border-2 border-transparent hover:border-[#B9FF66] hover:bg-white/5 group transition-all"
             >

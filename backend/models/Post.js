@@ -15,6 +15,11 @@ const PostSchema = new mongoose.Schema({
   mediaUrl: { type: String, default: null }, // For pictures/links
   userProfilePicture: { type: String, default: "" }, // <--- NEW
   linkUrl: { type: String, default: null },
+  // Add this inside your PostSchema
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   comments: [CommentSchema]
 }, { timestamps: true });
 

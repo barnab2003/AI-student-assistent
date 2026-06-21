@@ -35,6 +35,7 @@ connectDB();
 // Route Mountpoints
 app.use('/api/auth', require('./routes/auth')); 
 app.use('/api/roadmap', require('./routes/roadmap'));
+app.use('/api/posts', require('./routes/posts'));
 app.use('/api/community', require('./routes/community'));
 app.use('/api/upload', require('./routes/upload'));
 // NEW: Basic Socket Connection Logger

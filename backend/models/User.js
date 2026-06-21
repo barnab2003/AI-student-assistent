@@ -9,7 +9,12 @@ const UserSchema = new mongoose.Schema({
   streak: { type: Number, default: 0 },
   lastLogin: { type: Date, default: null },
   // NEW: Profile Picture field
-  profilePicture: { type: String, default: "" }
+  profilePicture: { type: String, default: "" },
+  // Add this inside your UserSchema
+  badges: {
+    type: [String],
+    default: ['first_login'] // Everyone gets a freebie badge to start!
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);

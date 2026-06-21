@@ -6,15 +6,22 @@ import { CheckCircle, Circle, Flame, Trophy, Sparkles, Loader2, Search, Edit2, C
 import Navbar from './dashboard/Navbar';
 import Sidebar from './dashboard/Sidebar';
 import HomeTab from './dashboard/HomeTab';
-import RoadmapTab from './dashboard/RoadmapTab'; // <--- NEW IMPORT
+import RoadmapTab from './dashboard/RoadmapTab'; 
 import CommunityTab from './dashboard/CommunityTab';
 import LeaderboardTab from './dashboard/LeaderboardTab';
 import QuizTab from './dashboard/QuizTab';
+import axios from 'axios';
+import BadgesTab from './dashboard/BadgesTab';
+
 const Dashboard = () => {
   // --- 1. STATE VARIABLES ---
   const [roadmap, setRoadmap] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [page, setPage] = useState(1);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [genParams, setGenParams] = useState({ track: '', daysToComplete: 30 });
@@ -86,12 +93,35 @@ const Dashboard = () => {
     }
   }, [activeTab]);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (pageNumber = 1) => {
+    setIsFetchingMore(true);
     try {
-      const res = await api.get('/community');
-      setPosts(res.data);
-    } catch (err) { console.error(err); }
+      // Pass the page number to our newly updated backend route
+      const res = await axios.get(`http://localhost:5000/api/posts?page=${pageNumber}&limit=10`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      
+      if (pageNumber === 1) {
+        // If it's the first page, replace the array entirely (useful for initial load or refreshing)
+        setPosts(res.data.posts);
+      } else {
+        // If it's page 2+, append the new posts to the BOTTOM of the existing array
+        setPosts(prevPosts => [...prevPosts, ...res.data.posts]);
+      }
+      
+      setHasMorePosts(res.data.hasMore);
+      setPage(pageNumber);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    } finally {
+      setIsFetchingMore(false);
+    }
   };
+
+  // Run this once when the component mounts to get the first 10 posts
+  useEffect(() => {
+    fetchPosts(1);
+  }, []);
 
   // --- 4. HANDLER FUNCTIONS ---
   const handleToggleTask = async (taskId, moduleName) => {
@@ -239,6 +269,37 @@ const Dashboard = () => {
     } catch (err) { console.error(err); }
   };
 
+  // --- HANDLE TOGGLE LIKE ---
+  const handleToggleLike = async (postId) => {
+    try {
+      // 1. Optimistically update the UI instantly
+      setPosts(posts.map(post => {
+        if (post._id === postId) {
+          const hasLiked = post.likes?.includes(user._id || user.id);
+          let newLikes = [...(post.likes || [])];
+          
+          if (hasLiked) {
+            newLikes = newLikes.filter(id => id !== (user._id || user.id));
+          } else {
+            newLikes.push(user._id || user.id);
+          }
+          return { ...post, likes: newLikes };
+        }
+        return post;
+      }));
+
+      // 2. Send request to the backend
+      // IMPORTANT: Adjust this URL to match your exact backend setup!
+      await axios.post(`http://localhost:5000/api/posts/${postId}/like`, {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      // In a production app, if this fails, you'd revert the optimistic UI update here
+    }
+  };
+
   // --- 5. RENDER UI ---
   if (loading) return <div className="p-10 text-center text-gray-500">Loading your profile...</div>;
 
@@ -303,6 +364,10 @@ const Dashboard = () => {
             newCommentText={newCommentText}
             setNewCommentText={setNewCommentText}
             handleCreateComment={handleCreateComment}
+            handleToggleLike={handleToggleLike}
+            fetchMorePosts={() => fetchPosts(page + 1)} // <-- ADD THIS
+            hasMorePosts={hasMorePosts}                 // <-- ADD THIS
+            isFetchingMore={isFetchingMore}
           />
         )}
 
@@ -313,6 +378,10 @@ const Dashboard = () => {
         {/* 🧠 TAB 5: AI QUIZ PANEL */}
         {activeTab === 'quizzes' && (
           <QuizTab currentUser={user} />
+        )}
+        {/* 🏅 TAB 6: MY BADGES PANEL */}
+        {activeTab === 'badges' && (
+          <BadgesTab currentUser={user} />
         )}
       </div>
     </div>

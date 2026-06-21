@@ -1,6 +1,5 @@
-import React from 'react';
-import { Search } from 'lucide-react';
-
+import { Search, Heart, Loader2 } from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
 const CommunityTab = ({
   user,
   posts,
@@ -18,8 +17,29 @@ const CommunityTab = ({
   handleDeletePost,
   newCommentText,
   setNewCommentText,
-  handleCreateComment
+  handleCreateComment,
+  handleToggleLike,
+  fetchMorePosts, // <-- Add this
+  hasMorePosts,   // <-- Add this
+  isFetchingMore
 }) => {
+  // This creates a reference to our invisible "tripwire" div
+  const observer = useRef();
+
+  // This function attaches the observer to the last element
+  const lastPostElementRef = useCallback(node => {
+    if (isFetchingMore) return; // Don't trigger if we are already fetching
+    if (observer.current) observer.current.disconnect(); // Disconnect previous observer
+    
+    observer.current = new IntersectionObserver(entries => {
+      // If the tripwire enters the screen AND we have more posts in the database
+      if (entries[0].isIntersecting && hasMorePosts) {
+        fetchMorePosts(); // FIRE THE FETCH!
+      }
+    });
+    
+    if (node) observer.current.observe(node);
+  }, [isFetchingMore, hasMorePosts, fetchMorePosts]);
   return (
     <div className="max-w-3xl mx-auto space-y-10">
       
@@ -118,7 +138,31 @@ const CommunityTab = ({
             {post.mediaUrl && (
               <img src={post.mediaUrl} alt="Post attachment" className="rounded-2xl max-h-[32rem] w-full object-cover border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] mt-2" />
             )}
-            
+            {/* --- INTERACTIVE ACTION BAR (NEW) --- */}
+            <div className="flex items-center space-x-4 mt-6">
+              {/* Like Button */}
+              <button 
+                onClick={() => handleToggleLike(post._id)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl border-2 border-black font-black text-sm transition-all ${
+                  post.likes?.includes(user?.id || user?._id) 
+                    ? 'bg-[#FF90E8] text-black shadow-[2px_2px_0px_rgba(0,0,0,1)] scale-105' // Cyber-Pink when liked
+                    : 'bg-white text-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:bg-gray-100'
+                }`}
+              >
+                <Heart 
+                  size={20} 
+                  className={post.likes?.includes(user?.id || user?._id) ? "fill-black" : ""} 
+                  strokeWidth={2.5} 
+                />
+                <span>{post.likes?.length || 0}</span>
+              </button>
+              
+              {/* Comment Counter (Read-only UI flex) */}
+              <div className="flex items-center space-x-2 px-4 py-2 rounded-xl border-2 border-black font-black text-sm bg-white text-black shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                <span className="text-xl leading-none -mt-1">💬</span>
+                <span>{post.comments?.length || 0} Comments</span>
+              </div>
+            </div>
             {/* Embedded Threaded Comments Section (Inverted Dark Theme) */}
             <div className=" bg-white p-5 sm:p-6 rounded-2xl border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] mt-6 space-y-4">
               
@@ -152,7 +196,26 @@ const CommunityTab = ({
 
           </div>
         ))}
-        
+        {/* --- INFINITE SCROLL TRIPWIRE & LOADER --- */}
+        {hasMorePosts && posts.length > 0 && (
+          <div ref={lastPostElementRef} className="py-8 flex justify-center">
+            {isFetchingMore ? (
+              <div className="bg-[#B9FF66] border-2 border-black p-3 rounded-full shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+                <Loader2 className="animate-spin text-black" size={32} strokeWidth={3} />
+              </div>
+            ) : (
+              <div className="h-10"></div> /* Invisible spacer tripwire */
+            )}
+          </div>
+        )}
+
+        {!hasMorePosts && posts.length > 0 && (
+          <div className="text-center py-10">
+            <p className="text-gray-500 font-bold uppercase tracking-widest text-sm border-t-2 border-dashed border-gray-300 pt-6 inline-block">
+              You've reached the end of the feed.
+            </p>
+          </div>
+        )}
         {/* Empty State / No Posts Found */}
         {posts.length === 0 && (
            <div className="bg-white p-10 rounded-[2rem] border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] text-center">
