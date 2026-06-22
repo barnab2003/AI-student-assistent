@@ -98,5 +98,35 @@ router.post('/add-xp', async (req, res) => {
     res.status(500).json({ message: "Server error adding XP" });
   }
 });
+// @route   PUT /api/auth/profile
+// @desc    Update user profile (username & profile picture)
+router.put('/profile', async (req, res) => {
+  try {
+    const { username, profilePicture } = req.body;
+    
+    // Find the user by the ID attached to the JWT token
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Update the fields if they were provided
+    if (username) user.username = username;
+    if (profilePicture) user.profilePicture = profilePicture;
+
+    await user.save();
+
+    // Send back the updated, safe user object
+    res.json({
+      id: user._id,
+      username: user.username,
+      profilePicture: user.profilePicture,
+      level: user.level,
+      xp: user.xp,
+      streak: user.streak,
+      badges: user.badges
+    });
+  } catch (error) {
+    console.error("Profile Update Error:", error);
+    res.status(500).json({ message: "Server error updating profile" });
+  }
+});
 module.exports = router;

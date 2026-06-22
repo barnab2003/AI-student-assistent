@@ -12,6 +12,7 @@ import LeaderboardTab from './dashboard/LeaderboardTab';
 import QuizTab from './dashboard/QuizTab';
 import axios from 'axios';
 import BadgesTab from './dashboard/BadgesTab';
+import { uploadImageToCloudinary } from '../utils/uploadImage';
 
 const Dashboard = () => {
   // --- 1. STATE VARIABLES ---
@@ -163,42 +164,39 @@ const Dashboard = () => {
     }
   };
   
+  // --- HANDLE PROFILE UPDATE ---
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
+    
     try {
-      let uploadedImageUrl = user.profilePicture || ""; 
-      
-      // 1. Try to upload the image
+      let newProfilePicUrl = user.profilePicture; // Default to existing picture
+
+      // 1. If the user selected a new file, shoot it up to Cloudinary first
       if (editProfileData.file) {
-        console.log("Step 1: Uploading image to server...");
-        const formData = new FormData();
-        formData.append('image', editProfileData.file);
+        const uploadedUrl = await uploadImageToCloudinary(editProfileData.file);
         
-        const uploadRes = await api.post('/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        console.log("Upload Success! Image URL:", uploadRes.data.imageUrl);
-        uploadedImageUrl = uploadRes.data.imageUrl;
+        if (uploadedUrl) {
+          newProfilePicUrl = uploadedUrl;
+        } else {
+          alert("Image upload failed. Check your Cloudinary keys!");
+          return; // Stop the execution if the upload fails
+        }
       }
 
-      // 2. Try to save the new data to the database
-      console.log("Step 2: Saving profile to database...");
-      const res = await api.put('/auth/profile', {
-        username: editProfileData.username || user.username,
-        profilePicture: uploadedImageUrl
+      // 2. Send the new text URL to your MongoDB database
+      const res = await axios.put('http://localhost:5000/api/auth/profile', {
+        username: editProfileData.username,
+        profilePicture: newProfilePicUrl
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
-      // 3. Update the UI
-      console.log("Step 3: Profile updated successfully!");
+      // 3. Update the frontend UI with the new data from the database
       setUser(res.data);
-      localStorage.setItem('user', JSON.stringify(res.data));
-      setIsEditingProfile(false);
-      fetchPosts(); 
-      
-    } catch (err) { 
-      console.error("FULL ERROR:", err);
-      // This will pop up a box on your screen telling us exactly what failed!
-      alert("Save Failed: " + (err.response?.data?.message || err.message)); 
+      setIsEditingProfile(false); // Close the edit window
+
+    } catch (error) {
+      console.error("Error updating profile:", error);
     }
   };
 
@@ -218,32 +216,39 @@ const Dashboard = () => {
     }
   };
 
-  const handleCreatePost = async (e) => {
-    e.preventDefault();
-    if (!newPostText.trim() && !imageFile) return;
-    
-    try {
-      let uploadedImageUrl = null;
-      
-      // If there is an image, upload it to the new route first
-      if (imageFile) {
-        const formData = new FormData();
-        formData.append('image', imageFile);
-        const uploadRes = await api.post('/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        uploadedImageUrl = uploadRes.data.imageUrl;
-      }
+  const handleCreatePost = async (postText, imageFile) => {
+    if (!postText && !imageFile) return; // Prevent empty posts
 
-      // Create the post with the text and the new image URL
-      await api.post('/community/post', { 
-        text: newPostText,
-        mediaUrl: uploadedImageUrl 
+    let mediaUrl = "";
+
+    // 1. If the user attached an image, upload it to Cloudinary first
+    if (imageFile) {
+      mediaUrl = await uploadImageToCloudinary(imageFile);
+      
+      if (!mediaUrl) {
+        alert("Image upload failed. Please try again.");
+        return; // Stop the execution if the upload fails
+      }
+    }
+
+    // 2. Send the text and the new Cloudinary URL to your MongoDB backend
+    try {
+      const res = await axios.post('http://localhost:5000/api/community/post', {
+        text: postText,
+        mediaUrl: mediaUrl // Storing just the URL string!
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       
-      setNewPostText('');
-      setImageFile(null); // Reset the file input
-    } catch (err) { console.error(err); }
+      // 3. Optimistically add the new post to the top of the feed
+      setPosts([res.data, ...posts]);
+      
+      return true; // Return true so the frontend knows it succeeded and can clear the input
+    } catch (error) {
+      console.error("Error creating post", error);
+      alert("Failed to create post.");
+      return false;
+    }
   };
 
   const handleDeletePost = async (postId) => {

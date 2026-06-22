@@ -1,14 +1,12 @@
-import { Search, Heart, Loader2 } from 'lucide-react';
 import React, { useState, useRef, useCallback } from 'react';
+import { Search, Heart, Loader2, Image as ImageIcon, X } from 'lucide-react';
+
 const CommunityTab = ({
   user,
   posts,
   searchQuery,
   setSearchQuery,
   handleCreatePost,
-  newPostText,
-  setNewPostText,
-  setImageFile,
   editingPostId,
   setEditingPostId,
   editPostText,
@@ -19,14 +17,35 @@ const CommunityTab = ({
   setNewCommentText,
   handleCreateComment,
   handleToggleLike,
-  fetchMorePosts, // <-- Add this
-  hasMorePosts,   // <-- Add this
+  fetchMorePosts, 
+  hasMorePosts,   
   isFetchingMore
 }) => {
-  // This creates a reference to our invisible "tripwire" div
+  // 1. Local state for the new Post + Image Upload feature
+  const [newPostText, setNewPostText] = useState("");
+  const [postImage, setPostImage] = useState(null);
+  const [isPosting, setIsPosting] = useState(false);
+
+  // 2. Local submit handler to manage the loading spinner
+  const submitPost = async (e) => {
+    e.preventDefault();
+    setIsPosting(true);
+    
+    // Pass the local state up to the Dashboard's handleCreatePost function
+    const success = await handleCreatePost(newPostText, postImage);
+    
+    if (success) {
+      setNewPostText(""); // Clear text on success
+      setPostImage(null); // Clear image on success
+    }
+    
+    setIsPosting(false);
+  };
+
+  // 3. Infinite Scroll: Reference to our invisible "tripwire" div
   const observer = useRef();
 
-  // This function attaches the observer to the last element
+  // 4. Infinite Scroll: Attaches the observer to the last element
   const lastPostElementRef = useCallback(node => {
     if (isFetchingMore) return; // Don't trigger if we are already fetching
     if (observer.current) observer.current.disconnect(); // Disconnect previous observer
@@ -40,29 +59,55 @@ const CommunityTab = ({
     
     if (node) observer.current.observe(node);
   }, [isFetchingMore, hasMorePosts, fetchMorePosts]);
+
   return (
     <div className="max-w-3xl mx-auto space-y-10">
       
       {/* Create Post Interface Card (Brutalist Redesign) */}
-      <form onSubmit={handleCreatePost} className="bg-white p-6 sm:p-8 rounded-[2rem] border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] space-y-5">
-        
-        <textarea
-          className="w-full p-4 border-2 border-black rounded-xl resize-none focus:ring-4 focus:ring-[#B9FF66] outline-none text-black font-medium transition-all"
-          rows="3"
-          placeholder="Share an insight, question, link, or progress picture..."
+      {/* --- CREATE POST BAR --- */}
+      <form onSubmit={submitPost} className="bg-[#191A23] p-6 rounded-[2rem] border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] mb-8">
+        <textarea 
+          placeholder="Share a resource, ask a question, or drop a meme..."
+          className="w-full bg-white text-black p-4 rounded-xl border-2 border-black resize-none h-24 outline-none focus:ring-4 focus:ring-[#B9FF66] font-medium"
           value={newPostText}
           onChange={(e) => setNewPostText(e.target.value)}
         />
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          {/* Brutalist File Upload Input */}
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={(e) => setImageFile(e.target.files[0])} 
-            className="w-full sm:w-auto text-sm font-bold text-gray-600 file:cursor-pointer file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-2 file:border-black file:text-sm file:font-black file:bg-white file:text-black hover:file:bg-[#B9FF66] file:shadow-[2px_2px_0px_rgba(0,0,0,1)] file:transition-all"
-          />
-          <button type="submit" className="w-full sm:w-auto bg-black text-[#B9FF66] px-8 py-3 rounded-xl font-black text-sm border-2 border-black shadow-[4px_4px_0px_rgba(185,255,102,1)] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(185,255,102,1)] transition-all">
-            Post
+        
+        {/* Image Preview Area */}
+        {postImage && (
+          <div className="relative mt-4 inline-block">
+            <img 
+              src={URL.createObjectURL(postImage)} 
+              alt="Preview" 
+              className="max-h-48 rounded-xl border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] object-cover"
+            />
+            <button 
+              type="button" 
+              onClick={() => setPostImage(null)}
+              className="absolute -top-3 -right-3 bg-[#FF90E8] p-1 rounded-full border-2 border-black hover:scale-110 transition-transform"
+            >
+              <X size={20} className="text-black" strokeWidth={3} />
+            </button>
+          </div>
+        )}
+
+        <div className="flex justify-between items-center mt-4">
+          <label className="cursor-pointer bg-white border-2 border-black p-3 rounded-xl hover:bg-[#B9FF66] transition-colors shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+            <ImageIcon size={24} className="text-black" />
+            <input 
+              type="file" 
+              className="hidden" 
+              accept="image/*"
+              onChange={(e) => setPostImage(e.target.files[0])}
+            />
+          </label>
+          
+          <button 
+            type="submit" 
+            disabled={isPosting || (!newPostText.trim() && !postImage)}
+            className="bg-[#B9FF66] text-black font-black px-8 py-3 rounded-xl border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          >
+            {isPosting ? <Loader2 className="animate-spin" size={20} /> : <span>POST</span>}
           </button>
         </div>
       </form>
