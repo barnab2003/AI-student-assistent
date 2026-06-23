@@ -4,7 +4,7 @@ import { ActivityCalendar } from 'react-activity-calendar';
 import { io } from 'socket.io-client';
 import { CheckCircle, Circle, Flame, Trophy, Sparkles, Loader2, Search, Edit2, Camera } from 'lucide-react';
 import Navbar from './dashboard/Navbar';
-import Sidebar from './dashboard/Sidebar';
+import Sidebar from './dashboard/SideBar';
 import HomeTab from './dashboard/HomeTab';
 import RoadmapTab from './dashboard/RoadmapTab'; 
 import CommunityTab from './dashboard/CommunityTab';
