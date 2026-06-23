@@ -15,7 +15,8 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "https://10xcs.vercel.app", // Your React frontend URL
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
   }
 });
 
