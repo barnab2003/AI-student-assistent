@@ -14,7 +14,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Your React frontend URL
+    origin: "https://10xcs.vercel.app", // Your React frontend URL
     methods: ["GET", "POST"]
   }
 });
