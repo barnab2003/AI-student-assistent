@@ -14,7 +14,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Your React frontend URL
+    origin: "*", // Your React frontend URL
     methods: ["GET", "POST"]
   }
 });
@@ -28,6 +28,7 @@ app.use((req, res, next) => {
   req.io = io;
   next();
 });
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Connect Database
 connectDB();

@@ -98,7 +98,7 @@ const Dashboard = () => {
     setIsFetchingMore(true);
     try {
       // Pass the page number to our newly updated backend route
-      const res = await axios.get(`http://localhost:5000/api/posts?page=${pageNumber}&limit=10`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/posts?page=${pageNumber}&limit=10`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       
@@ -184,7 +184,7 @@ const Dashboard = () => {
       }
 
       // 2. Send the new text URL to your MongoDB database
-      const res = await axios.put('http://localhost:5000/api/auth/profile', {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
         username: editProfileData.username,
         profilePicture: newProfilePicUrl
       }, {
@@ -233,7 +233,7 @@ const Dashboard = () => {
 
     // 2. Send the text and the new Cloudinary URL to your MongoDB backend
     try {
-      const res = await axios.post('http://localhost:5000/api/community/post', {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/community/post`, {
         text: postText,
         mediaUrl: mediaUrl // Storing just the URL string!
       }, {
@@ -295,7 +295,7 @@ const Dashboard = () => {
 
       // 2. Send request to the backend
       // IMPORTANT: Adjust this URL to match your exact backend setup!
-      await axios.post(`http://localhost:5000/api/posts/${postId}/like`, {}, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/posts/${postId}/like`, {}, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       

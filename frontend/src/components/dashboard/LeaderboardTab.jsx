@@ -10,7 +10,7 @@ const LeaderboardTab = ({ currentUser }) => {
     const fetchLeaderboard = async () => {
       try {
         // Adjust the URL if your backend is hosted elsewhere!
-        const res = await axios.get('http://localhost:5000/api/auth/leaderboard');
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/leaderboard`);
         setLeaders(res.data);
       } catch (error) {
         console.error("Error fetching leaderboard", error);

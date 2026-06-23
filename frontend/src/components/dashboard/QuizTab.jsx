@@ -21,7 +21,7 @@ const QuizTab = ({ currentUser }) => {
     try {
       // NOTE: Ensure this matches your backend route!
       // Change this line:
-      const res = await axios.post('http://localhost:5000/api/roadmap/generate-quiz', { topic });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/roadmap/generate-quiz`, { topic });
       setQuizData(res.data.quiz); // Expecting an array of 3 questions
       setCurrentQIndex(0);
       setScore(0);
@@ -64,7 +64,7 @@ const QuizTab = ({ currentUser }) => {
 
   const awardXP = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/add-xp', { username: currentUser.username, xpToAdd: 50 });
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/add-xp`, { username: currentUser.username, xpToAdd: 50 });
       // In a real app, you'd trigger a context/state update here to refresh the user's XP in the Navbar
     } catch (error) {
       console.error("Error adding XP", error);
