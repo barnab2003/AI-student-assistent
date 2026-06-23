@@ -24,7 +24,7 @@ const Auth = () => {
     try {
       if (isLogin) {
         // LOGIN LOGIC
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/community/post`, { 
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, { 
           email: formData.email, 
           password: formData.password 
         });
@@ -36,7 +36,7 @@ const Auth = () => {
 
       } else {
         // REGISTER LOGIC
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/community/post`, { 
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, { 
           username: formData.username, 
           email: formData.email, 
           password: formData.password 
