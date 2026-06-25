@@ -185,6 +185,11 @@ router.post('/generate', protect, async (req, res) => {
 
   } catch (error) {
     console.error("🔥 Detailed Backend Error:", error.message);
+    // 1. Check if the error came specifically from the Google Generative AI API
+    if (error.status === 503 || (error.message && error.message.includes('503'))) {
+      // Forward the 503 status explicitly to the frontend!
+      return res.status(503).json({ message: "AI API is busy. Please try again." });
+    }
     res.status(500).json({ message: "Failed to generate AI roadmap." });
   }
 });
