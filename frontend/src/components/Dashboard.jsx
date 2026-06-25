@@ -157,8 +157,14 @@ const Dashboard = () => {
       const response = await api.post('/roadmap/generate', genParams);
       setRoadmap(response.data);
     } catch (error) {
-      console.error("Error generating roadmap", error);
-      alert("Failed to generate roadmap. Please try again.");
+      console.error("AI Generation Error:", error);
+    
+    // Check if the error is coming from an overloaded server
+    if (error.response?.status === 503 || error.message.includes('503')) {
+      alert("The AI servers are currently taking a quick coffee break due to high demand! Please wait 60 seconds and try again.");
+    } else {
+      alert("Something went wrong generating your roadmap. Please try again later.");
+    }
     } finally {
       setIsGenerating(false);
     }
