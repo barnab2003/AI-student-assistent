@@ -1,4 +1,4 @@
-# 10xCS - AI Student Assistant
+# 10xCS 
 
 ![MERN Stack](https://img.shields.io/badge/MERN-Stack-blue?style=for-the-badge&logo=mongodb)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -6,13 +6,13 @@
 ![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)
 ![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)
 
-10xCS is a production-ready, full-stack educational platform designed to empower students with AI-driven learning roadmaps, real-time community engagement, and intelligent study tools. 
+10xCS is a production-ready, full-stack educational platform designed to empower beginner developers with AI-driven learning roadmaps, real-time community engagement, and intelligent study tools. 
 
 Built with the MERN stack (MongoDB, Express, React, Node.js), this platform goes beyond a standard MVP by integrating real-time WebSockets, direct-to-cloud media storage, and fault-tolerant third-party AI integrations.
 
 ---
 
-## 🚀 Beyond the MVP: Engineering for the Real World
+## Beyond the MVP: Engineering for the Real World
 
 Most student projects stop at basic CRUD operations. This platform was architected to handle real-world edge cases, production deployments, and API rate limits. 
 
@@ -34,7 +34,7 @@ Most student projects stop at basic CRUD operations. This platform was architect
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 The application follows a decoupled client-server architecture.
 
@@ -58,7 +58,7 @@ File generated successfully.
 
 ---
 
-## 📂 Codebase Structure & Deep Dive
+## Codebase Structure & Deep Dive
 
 ### The Frontend (`/frontend/src/`)
 
@@ -91,7 +91,7 @@ File generated successfully.
 
 ---
 
-## 💻 Local Development Setup
+## Local Development Setup
 
 To run this project locally, you need Node.js and npm installed.
 
