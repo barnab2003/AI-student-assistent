@@ -184,13 +184,19 @@ router.post('/generate', protect, async (req, res) => {
     res.status(201).json(roadmap);
 
   } catch (error) {
-    console.error("🔥 Detailed Backend Error:", error.message);
-    // 1. Check if the error came specifically from the Google Generative AI API
-    if (error.status === 503 || (error.message && error.message.includes('503'))) {
-      // Forward the 503 status explicitly to the frontend!
-      return res.status(503).json({ message: "AI API is busy. Please try again." });
+    console.error("🔥 Detailed Backend Error:", error);
+
+    // 1. Brutally convert the entire error object into a raw string
+    const errorString = String(error.message || error);
+
+    // 2. Scan that string for the 503 signature
+    if (errorString.includes('503')) {
+      // It MUST hit this line now. Return the return so the code stops executing!
+      return res.status(503).json({ message: "The AI is taking a quick coffee break!" });
     }
-    res.status(500).json({ message: "Failed to generate AI roadmap." });
+
+    // 3. The fallback 500
+    res.status(500).json({ message: "Internal server error generating roadmap" });
   }
 });
 
