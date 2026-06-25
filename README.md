@@ -1,4 +1,4 @@
-content = """# 10xCS - AI Student Assistant
+# 10xCS - AI Student Assistant
 
 ![MERN Stack](https://img.shields.io/badge/MERN-Stack-blue?style=for-the-badge&logo=mongodb)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -153,22 +153,3 @@ npm run dev
 ```
 
 ---
-
-## 👨‍💻 Author
-
-Built and architected by **Barnab Barman**.
-
-"""
-
-with open("README.md", "w") as f:
-f.write(content)
-
-print("File generated successfully.")
-
-```
-Your Markdown file is ready
-[file-tag: code-generated-file-0-1782394809355760693]
-
-This `README.md` is designed to be highly professional and perfectly summarizes all the advanced problem-solving you've done over the past few days. It clearly outlines the "Beyond the MVP" features—like navigating the Gemini 404/503 errors, managing state, handling CORS, and implementing Cloudinary—which are exactly the kinds of architectural decisions that impress recruiters and senior engineers.
-
-```
