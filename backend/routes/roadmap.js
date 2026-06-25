@@ -127,7 +127,7 @@ router.post('/generate', protect, async (req, res) => {
       `;
     // 2. Call the Gemini API natively enforcing JSON output
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-3.1-flash-lite",
       generationConfig: {
         responseMimeType: "application/json",
       }
@@ -237,7 +237,7 @@ router.post('/recalculate', protect, async (req, res) => {
 
     // 2. Setup the Model (Using 3.5 Flash for speed)
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-3.1-flash-lite",
       generationConfig: { responseMimeType: "application/json" }
     });
 
@@ -305,7 +305,7 @@ router.post('/generate-quiz', async (req, res) => {
 
     // 🐛 FIX 1: Initialize the Gemini model here!
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-3.1-flash-lite",
       generationConfig: { responseMimeType: "application/json" }
     });
 
