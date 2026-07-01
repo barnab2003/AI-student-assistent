@@ -8,19 +8,13 @@
 
 10xCS is a production-ready, full-stack educational platform designed to empower beginner developers with AI-driven learning roadmaps, real-time community engagement, and intelligent study tools. 
 
-Built with the MERN stack (MongoDB, Express, React, Node.js), this platform goes beyond a standard MVP by integrating real-time WebSockets, direct-to-cloud media storage, and fault-tolerant third-party AI integrations.
+Built with the MERN stack (MongoDB, Express, React, Node.js), this platform goes beyond a standard MVP by integrating real-time WebSockets, direct-to-cloud media storage, and fault-tolerant AI integrations. This platform was architected to handle real-world edge cases, production deployments, and API rate limits. 
 
----
-
-## Beyond the MVP: Engineering for the Real World
-
-Most student projects stop at basic CRUD operations. This platform was architected to handle real-world edge cases, production deployments, and API rate limits. 
-
-### 1. Fault-Tolerant AI Architecture (Google Gemini)
+### 1. Fault-Tolerant AI Architecture 
 * **High-Volume Model Routing:** Instead of defaulting to congested experimental models, the backend routes requests to `gemini-3.1-flash-lite`, a model explicitly optimized for high-frequency developer requests. This bypasses the "Shared IP Penalty" often encountered on free hosting tiers like Render.
 * **Graceful Degradation:** When upstream AI servers experience traffic spikes, the backend safely catches `503 Service Unavailable` errors. Instead of crashing or leaving the user with an infinite loading spinner, it parses the custom GoogleGenerativeAI Error and forwards a clean 503 status to the frontend, which triggers a user-friendly UI toast notification.
 
-### 2. Scalable Media Management (Cloudinary)
+### 2. Scalable Media Management 
 * **Direct-to-Cloud Uploads:** Handling image uploads (like community feed memes or profile pictures) on a Node.js server drains memory and bandwidth. This platform utilizes a Cloudinary integration pipeline. 
 * **Database Optimization:** Images are uploaded securely to Cloudinary, and only the lightweight string URL is stored in MongoDB. This keeps database queries lightning fast.
 
