@@ -315,7 +315,7 @@ const Dashboard = () => {
   if (loading) return <div className="p-10 text-center text-gray-500">Loading your profile...</div>;
 
   return (
-    // 1. Main Wrapper: Deep slate background, monospace font, full height, no scrolling on the body
+  // 1. Main Wrapper: Deep slate background, monospace font, full height, no scrolling on the body
     <div className="flex h-screen bg-[#1a2322] font-mono text-[#bac2de] overflow-hidden">
       
 
@@ -425,7 +425,7 @@ const Dashboard = () => {
         </div>
       </main>
     </div>
-  );
+  );  
 };
 
 export default Dashboard;

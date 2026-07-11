@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Trophy, BrainCircuit, Medal, Settings, Zap } from 'lucide-react';
 
-const Sidebar = ({ isSidebarOpen, toggleSidebar, setActiveTab }) => { // <--- ADDED setActiveTab HERE
+const Sidebar = ({ isSidebarOpen, toggleSidebar, setActiveTab, activeTab }) => { // <--- ADDED setActiveTab HERE
   const menuItems = [
     { name: 'Global Leaderboard', tabId: 'leaderboard', icon: Trophy, color: 'text-yellow-400' },
     { name: 'AI Quizzes', tabId: 'quizzes', icon: BrainCircuit, color: 'text-pink-400' },

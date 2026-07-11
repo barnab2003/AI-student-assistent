@@ -2,7 +2,7 @@ import React from 'react';
 import { Menu } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
-const Navbar = ({ activeTab, setActiveTab, toggleSidebar }) => { // <--- ADD toggleSidebar HERE
+const Navbar = ({ toggleSidebar, activeTab, setActiveTab }) => { // <--- ADD toggleSidebar HERE
   return (
     <nav className="bg-[#111818] border-b border-[#313244] sticky top-0 z-50 font-mono text-[#bac2de]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
