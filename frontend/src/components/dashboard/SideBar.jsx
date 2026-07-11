@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Trophy, BrainCircuit, Medal, Settings, Zap } from 'lucide-react';
+import { Home, Map, Globe, Trophy, BrainCircuit, Medal, Settings, Zap, X, Lock } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar, setActiveTab, activeTab }) => { // <--- ADDED setActiveTab HERE
   const menuItems = [
