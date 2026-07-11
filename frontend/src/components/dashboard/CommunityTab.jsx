@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Search, Heart, Loader2, Image as ImageIcon, X } from 'lucide-react';
+import { MessageCircle, Heart, ImageIcon, X, Search, Loader2 } from 'lucide-react';
 
 const CommunityTab = ({
   user,
