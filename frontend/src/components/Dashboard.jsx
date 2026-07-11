@@ -315,86 +315,128 @@ const Dashboard = () => {
   if (loading) return <div className="p-10 text-center text-gray-500">Loading your profile...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pb-12">
+    // 1. Main Wrapper: Deep slate background, monospace font, full height, no scrolling on the body
+    <div className="flex h-screen bg-[#1a2322] font-mono text-[#bac2de] overflow-hidden">
       
-      {/* 0. Injected Offcanvas Sidebar */}
-      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} setActiveTab={setActiveTab} />
-
-      {/* 1. Injected Navbar Component */}
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} toggleSidebar={toggleSidebar} />
-
-      <div className="max-w-6xl mx-auto p-4 sm:p-6 mt-4">
-        
-{/* 🏠 TAB 1: HOME PANEL */}
-        {/* 2. Injected Home Tab Component */}
-        {activeTab === 'home' && (
-          <HomeTab 
-            user={user} 
-            roadmap={roadmap}
-            isEditingProfile={isEditingProfile}
-            setIsEditingProfile={setIsEditingProfile}
-            editProfileData={editProfileData}
-            setEditProfileData={setEditProfileData}
-            handleUpdateProfile={handleUpdateProfile}
-          />
-        )}
-
-        {/* 🗺️ TAB 2: ROADMAP PANEL */}
-        {activeTab === 'roadmap' && (
-          <RoadmapTab 
-            roadmap={roadmap}
-            showGenerator={showGenerator}
-            setShowGenerator={setShowGenerator}
-            isGenerating={isGenerating}
-            genParams={genParams}
-            setGenParams={setGenParams}
-            handleGenerateAI={handleGenerateAI}
-            isRecalculating={isRecalculating}
-            handleRecalculate={handleRecalculate}
-            handleToggleTask={handleToggleTask}
-          />
-        )}
-
-        {/* 👥 TAB 3: COMMUNITY PANEL */}
-        {activeTab === 'community' && (
-          <CommunityTab
-            user={user}
-            posts={posts}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            handleCreatePost={handleCreatePost}
-            newPostText={newPostText}
-            setNewPostText={setNewPostText}
-            setImageFile={setImageFile}
-            editingPostId={editingPostId}
-            setEditingPostId={setEditingPostId}
-            editPostText={editPostText}
-            setEditPostText={setEditPostText}
-            submitEditPost={submitEditPost}
-            handleDeletePost={handleDeletePost}
-            newCommentText={newCommentText}
-            setNewCommentText={setNewCommentText}
-            handleCreateComment={handleCreateComment}
-            handleToggleLike={handleToggleLike}
-            fetchMorePosts={() => fetchPosts(page + 1)} // <-- ADD THIS
-            hasMorePosts={hasMorePosts}                 // <-- ADD THIS
-            isFetchingMore={isFetchingMore}
-          />
-        )}
-
-        {/* 🏆 TAB 4: LEADERBOARD PANEL */}
-        {activeTab === 'leaderboard' && (
-          <LeaderboardTab currentUser={user} />
-        )}
-        {/* 🧠 TAB 5: AI QUIZ PANEL */}
-        {activeTab === 'quizzes' && (
-          <QuizTab currentUser={user} />
-        )}
-        {/* 🏅 TAB 6: MY BADGES PANEL */}
-        {activeTab === 'badges' && (
-          <BadgesTab currentUser={user} />
-        )}
+      {/* 2. Mobile Header (Only visible on small screens) */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#111818] border-b border-[#313244] flex items-center justify-between px-4 z-50">
+        <div className="flex items-center gap-2">
+           <div className="text-[#f38ba8] text-xl font-bold font-sans">▲ 10xCS</div>
+        </div>
+        <button 
+          onClick={toggleSidebar}
+          className="text-[#bac2de] hover:text-[#f38ba8] transition-colors"
+        >
+          {/* You can use your preferred icon library here. Example uses simple text if icons aren't imported */}
+          {isSidebarOpen ? 'Close ✕' : 'Menu ☰'}
+        </button>
       </div>
+
+      {/* 3. The Sidebar Overlay for Mobile (Clicking outside closes it) */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={toggleSidebar}
+        />
+      )}
+
+      {/* 4. The Sidebar Area */}
+      {/* Desktop: Fixed width on the left. Mobile: Slides in and out */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-64 bg-[#111818] border-r border-[#313244] transform transition-transform duration-300 ease-in-out
+        md:relative md:translate-x-0 
+        ${isSidebarOpen ? 'translate-x-0 pt-16 md:pt-0' : '-translate-x-full'}
+      `}>
+        {/* Your Sidebar Component - Make sure to update its internal colors! */}
+        <Sidebar 
+          isSidebarOpen={isSidebarOpen} 
+          toggleSidebar={toggleSidebar} 
+          setActiveTab={setActiveTab} 
+          activeTab={activeTab} // Good practice to pass this so the sidebar can highlight the current tab
+        />
+      </aside>
+
+      {/* 5. Main Content Area */}
+      <main className="flex-1 overflow-y-auto p-4 pt-20 md:pt-8 md:p-8 relative">
+        
+        {/* Optional Swirl Background (Matches the image vibe) */}
+        {/* <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'url("/path-to-swirl.svg")', backgroundSize: 'cover' }}></div> */}
+
+        <div className="relative z-10 max-w-5xl mx-auto">
+          
+          {/* 🏠 TAB 1: HOME PANEL */}
+          {activeTab === 'home' && (
+            <HomeTab 
+              user={user} 
+              roadmap={roadmap}
+              isEditingProfile={isEditingProfile}
+              setIsEditingProfile={setIsEditingProfile}
+              editProfileData={editProfileData}
+              setEditProfileData={setEditProfileData}
+              handleUpdateProfile={handleUpdateProfile}
+            />
+          )}
+
+          {/* 🗺️ TAB 2: ROADMAP PANEL */}
+          {activeTab === 'roadmap' && (
+            <RoadmapTab 
+              roadmap={roadmap}
+              showGenerator={showGenerator}
+              setShowGenerator={setShowGenerator}
+              isGenerating={isGenerating}
+              genParams={genParams}
+              setGenParams={setGenParams}
+              handleGenerateAI={handleGenerateAI}
+              isRecalculating={isRecalculating}
+              handleRecalculate={handleRecalculate}
+              handleToggleTask={handleToggleTask}
+            />
+          )}
+
+          {/* 👥 TAB 3: COMMUNITY PANEL */}
+          {activeTab === 'community' && (
+            <CommunityTab
+              user={user}
+              posts={posts}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              handleCreatePost={handleCreatePost}
+              newPostText={newPostText}
+              setNewPostText={setNewPostText}
+              setImageFile={setImageFile}
+              editingPostId={editingPostId}
+              setEditingPostId={setEditingPostId}
+              editPostText={editPostText}
+              setEditPostText={setEditPostText}
+              submitEditPost={submitEditPost}
+              handleDeletePost={handleDeletePost}
+              newCommentText={newCommentText}
+              setNewCommentText={setNewCommentText}
+              handleCreateComment={handleCreateComment}
+              handleToggleLike={handleToggleLike}
+              fetchMorePosts={() => fetchPosts(page + 1)}
+              hasMorePosts={hasMorePosts}
+              isFetchingMore={isFetchingMore}
+            />
+          )}
+
+          {/* 🏆 TAB 4: LEADERBOARD PANEL */}
+          {activeTab === 'leaderboard' && (
+            <LeaderboardTab currentUser={user} />
+          )}
+
+          {/* 🧠 TAB 5: AI QUIZ PANEL */}
+          {activeTab === 'quizzes' && (
+            <QuizTab currentUser={user} />
+          )}
+
+          {/* 🏅 TAB 6: MY BADGES PANEL */}
+          {activeTab === 'badges' && (
+            <BadgesTab currentUser={user} />
+          )}
+
+        </div>
+      </main>
     </div>
   );
 };
