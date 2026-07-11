@@ -3,10 +3,16 @@ import { X, Trophy, BrainCircuit, Medal, Settings, Zap } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar, setActiveTab, activeTab }) => { // <--- ADDED setActiveTab HERE
   const menuItems = [
-    { name: 'Global Leaderboard', tabId: 'leaderboard', icon: Trophy, color: 'text-yellow-400' },
-    { name: 'AI Quizzes', tabId: 'quizzes', icon: BrainCircuit, color: 'text-pink-400' },
-    { name: 'My Badges', tabId: 'badges', icon: Medal, color: 'text-blue-400' },
-    { name: 'Settings', tabId: 'settings', icon: Settings, color: 'text-gray-400' },
+   // --- ADD THESE MISSING TABS ---
+  { name: "Home", tabId: "home", icon: Home },
+  { name: "Roadmap", tabId: "roadmap", icon: Map },
+  { name: "Community", tabId: "community", icon: Globe },
+  
+  // --- KEEP YOUR EXISTING TABS ---
+  { name: "Global Leaderboard", tabId: "leaderboard", icon: Trophy },
+  { name: "AI Quizzes", tabId: "quizzes", icon: BrainCircuit },
+  { name: "My Badges", tabId: "badges", icon: Medal },
+  { name: "Settings", tabId: "settings", icon: Settings }
   ];
 
   return (
