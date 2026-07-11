@@ -16,18 +16,26 @@ const BadgesTab = ({ currentUser }) => {
   const userBadges = currentUser?.badges || ['first_login'];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-10">
+    <div className="max-w-5xl mx-auto space-y-8 pb-10 font-mono text-[#bac2de]">
       
       {/* Header Banner */}
-      <div className="bg-[#191A23] p-8 md:p-12 rounded-[2rem] border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] text-white relative overflow-hidden">
-        <Medal className="absolute -bottom-10 -right-10 text-gray-800 opacity-30 w-64 h-64 rotate-12" />
+      <div className="bg-[#111818] p-8 md:p-12 rounded-2xl border border-[#313244] shadow-lg relative overflow-hidden">
+        {/* Faded Background Icon */}
+        <Medal className="absolute -bottom-10 -right-10 text-[#1a2322] opacity-80 w-64 h-64 rotate-12" />
+        
         <div className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">Your <span className="text-[#FFC900]">Trophy Room</span></h1>
-          <p className="text-gray-400 font-bold text-lg max-w-xl">Complete milestones to unlock these digital badges. Flex them on the global leaderboard.</p>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-white">
+            Your <span className="text-[#f38ba8]">Trophy Room</span>
+          </h1>
+          <p className="text-[#bac2de]/70 font-medium text-sm md:text-base max-w-xl">
+            Complete milestones to unlock these digital badges. Flex them on the global leaderboard.
+          </p>
           
-          <div className="mt-6 inline-flex items-center space-x-2 bg-black border-2 border-gray-700 px-4 py-2 rounded-xl">
-            <span className="text-[#FFC900] font-black text-xl">{userBadges.length}</span>
-            <span className="text-gray-400 font-bold text-sm uppercase tracking-widest">/ {allBadges.length} Unlocked</span>
+          <div className="mt-6 inline-flex items-center space-x-3 bg-[#1a2322] border border-[#313244] px-4 py-2 rounded-lg">
+            <span className="text-[#89dceb] font-bold text-xl">{userBadges.length}</span>
+            <span className="text-[#bac2de]/50 font-semibold text-xs uppercase tracking-widest">
+              / {allBadges.length} Unlocked
+            </span>
           </div>
         </div>
       </div>
@@ -40,37 +48,45 @@ const BadgesTab = ({ currentUser }) => {
           return (
             <div 
               key={badge.id} 
-              className={`p-6 rounded-[2rem] border-2 transition-all duration-300 relative overflow-hidden ${
+              className={`p-6 rounded-xl border transition-all duration-300 relative overflow-hidden flex flex-col group ${
                 isUnlocked 
-                  ? 'bg-white border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] hover:-translate-y-2' 
-                  : 'bg-gray-50 border-dashed border-gray-400 opacity-70 grayscale'
+                  ? 'bg-[#111818] border-[#313244] shadow-md hover:-translate-y-1 hover:border-[#89dceb]/50' 
+                  : 'bg-[#1a2322]/40 border-dashed border-[#313244] opacity-60 grayscale'
               }`}
             >
               {/* Lock Overlay for locked badges */}
               {!isUnlocked && (
-                <div className="absolute top-4 right-4 bg-gray-200 p-2 rounded-full border-2 border-gray-400">
-                  <Lock size={16} className="text-gray-500" strokeWidth={3} />
+                <div className="absolute top-4 right-4 bg-[#111818] p-2 rounded-lg border border-[#313244]">
+                  <Lock size={16} className="text-[#bac2de]/40" strokeWidth={2} />
                 </div>
               )}
 
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] mb-6 ${
-                isUnlocked ? badge.color : 'bg-gray-200 shadow-none'
+              {/* Badge Icon Box */}
+              <div className={`w-14 h-14 rounded-lg flex items-center justify-center border mb-5 transition-colors ${
+                isUnlocked 
+                  ? `${badge.color} border-[#313244] shadow-sm` // Keeps your original badge.color variable
+                  : 'bg-[#111818] border-[#313244] shadow-none'
               }`}>
-                <badge.icon size={32} className={isUnlocked ? 'text-black' : 'text-gray-400'} strokeWidth={2.5} />
+                <badge.icon 
+                  size={28} 
+                  className={isUnlocked ? 'text-[#111818] opacity-90' : 'text-[#bac2de]/30'} 
+                  strokeWidth={2} 
+                />
               </div>
               
-              <h3 className={`text-xl font-black mb-2 ${isUnlocked ? 'text-black' : 'text-gray-500'}`}>
+              <h3 className={`text-lg font-bold mb-2 ${isUnlocked ? 'text-white' : 'text-[#bac2de]/50'}`}>
                 {badge.name}
               </h3>
               
-              <p className={`font-medium ${isUnlocked ? 'text-gray-600' : 'text-gray-400'}`}>
+              <p className={`text-sm leading-relaxed flex-1 ${isUnlocked ? 'text-[#bac2de]/80' : 'text-[#bac2de]/40'}`}>
                 {badge.desc}
               </p>
 
-              {/* Progress Bar Mockup (Optional UI flair) */}
+              {/* Progress Bar Mockup (Visible only when locked) */}
               {!isUnlocked && (
-                <div className="mt-4 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-gray-400 w-1/3"></div>
+                <div className="mt-5 h-1.5 w-full bg-[#111818] rounded-full overflow-hidden">
+                  {/* You can make the width dynamic later based on actual user progress */}
+                  <div className="h-full bg-[#313244] w-1/3 rounded-full"></div>
                 </div>
               )}
             </div>

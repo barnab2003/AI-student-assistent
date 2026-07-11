@@ -55,35 +55,35 @@ const Auth = () => {
     }
   };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-6 font-sans">
+    <div className="min-h-screen flex items-center justify-center bg-[#1a2322] p-6 font-mono text-[#bac2de]">
       
-      {/* Brutalist Auth Card */}
-      <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-[2rem] border-4 border-black shadow-[12px_12px_0px_rgba(0,0,0,1)]">
+      {/* Cyber-Zen Auth Card */}
+      <div className="w-full max-w-md bg-[#111818] p-8 sm:p-10 rounded-2xl border border-[#313244] shadow-2xl">
         
         {/* Logo / Header */}
         <div className="text-center mb-8">
-          <div className="flex justify-center items-center space-x-3 font-black text-3xl tracking-tight text-black mb-2">
+          <div className="flex justify-center items-center space-x-3 font-bold text-3xl tracking-tight mb-2">
             <img 
               src={logo} 
               alt="SmartStudy Logo" 
-              className="h-14 w-auto " 
+              className="h-14 w-auto opacity-90" 
             />
-            <span>10x.CS</span>
+            <span className="text-[#f38ba8]">10xCS</span>
           </div>
-          <p className="text-gray-600 font-bold uppercase tracking-widest text-sm mt-4">
-            {isLogin ? 'Welcome back.' : 'Start your journey.'}
+          <p className="text-[#89dceb] font-medium text-sm mt-4 opacity-80">
+            {isLogin ? 'Yours for the voyage. Welcome back.' : 'Your own workspace. Get started.'}
           </p>
         </div>
 
         {/* Auth Toggle Tabs */}
-        <div className="flex w-full mb-8 bg-gray-100 p-1.5 rounded-2xl border-2 border-black">
+        <div className="flex w-full mb-8 bg-[#1a2322] p-1.5 rounded-lg border border-[#313244]">
           <button
             type="button"
             onClick={() => { setIsLogin(true); setError(''); }}
-            className={`flex-1 py-3 px-4 rounded-xl font-black text-sm transition-all ${
+            className={`flex-1 py-2 px-4 rounded-md font-semibold text-sm transition-all ${
               isLogin 
-                ? 'bg-[#B9FF66] text-black border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]' 
-                : 'text-gray-500 hover:text-black border-2 border-transparent'
+                ? 'bg-[#313244] text-[#f38ba8] shadow-sm' 
+                : 'text-[#bac2de] hover:text-[#f38ba8] hover:bg-[#313244]/50'
             }`}
           >
             Log In
@@ -91,10 +91,10 @@ const Auth = () => {
           <button
             type="button"
             onClick={() => { setIsLogin(false); setError(''); }}
-            className={`flex-1 py-3 px-4 rounded-xl font-black text-sm transition-all ${
+            className={`flex-1 py-2 px-4 rounded-md font-semibold text-sm transition-all ${
               !isLogin 
-                ? 'bg-[#B9FF66] text-black border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]' 
-                : 'text-gray-500 hover:text-black border-2 border-transparent'
+                ? 'bg-[#313244] text-[#f38ba8] shadow-sm' 
+                : 'text-[#bac2de] hover:text-[#f38ba8] hover:bg-[#313244]/50'
             }`}
           >
             Sign Up
@@ -103,7 +103,7 @@ const Auth = () => {
 
         {/* Error Message Display */}
         {error && (
-          <div className="mb-6 p-4 bg-red-100 border-2 border-black rounded-xl text-red-600 font-bold text-sm text-center shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+          <div className="mb-6 p-3 bg-red-900/30 border border-red-500/50 rounded-lg text-red-400 text-sm text-center">
             {error}
           </div>
         )}
@@ -114,12 +114,12 @@ const Auth = () => {
           {/* Username Field (Only show if signing up) */}
           {!isLogin && (
             <div>
-              <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">Username</label>
+              <label className="block text-xs font-semibold text-[#89dceb] uppercase tracking-wider mb-2">Username</label>
               <input
                 type="text"
                 required
-                placeholder="e.g. CodeNinja99"
-                className="w-full p-4 border-2 border-black rounded-xl outline-none focus:ring-4 focus:ring-[#B9FF66] text-black font-medium transition-all"
+                placeholder="e.g. root_user"
+                className="w-full p-3 bg-[#1a2322] border border-[#313244] rounded-lg outline-none focus:border-[#f38ba8] focus:ring-1 focus:ring-[#f38ba8] text-[#bac2de] transition-all placeholder:text-[#bac2de]/40"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               />
@@ -128,12 +128,12 @@ const Auth = () => {
 
           {/* Email Field */}
           <div>
-            <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">Email Address</label>
+            <label className="block text-xs font-semibold text-[#89dceb] uppercase tracking-wider mb-2">Email Address</label>
             <input
               type="email"
               required
-              placeholder="you@example.com"
-              className="w-full p-4 border-2 border-black rounded-xl outline-none focus:ring-4 focus:ring-[#B9FF66] text-black font-medium transition-all"
+              placeholder="user@host.local"
+              className="w-full p-3 bg-[#1a2322] border border-[#313244] rounded-lg outline-none focus:border-[#f38ba8] focus:ring-1 focus:ring-[#f38ba8] text-[#bac2de] transition-all placeholder:text-[#bac2de]/40"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
@@ -141,12 +141,12 @@ const Auth = () => {
 
           {/* Password Field */}
           <div>
-            <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">Password</label>
+            <label className="block text-xs font-semibold text-[#89dceb] uppercase tracking-wider mb-2">Password</label>
             <input
               type="password"
               required
               placeholder="••••••••"
-              className="w-full p-4 border-2 border-black rounded-xl outline-none focus:ring-4 focus:ring-[#B9FF66] text-black font-medium transition-all"
+              className="w-full p-3 bg-[#1a2322] border border-[#313244] rounded-lg outline-none focus:border-[#f38ba8] focus:ring-1 focus:ring-[#f38ba8] text-[#bac2de] transition-all placeholder:text-[#bac2de]/40"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
@@ -156,9 +156,9 @@ const Auth = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex items-center justify-center bg-black text-[#B9FF66] border-2 border-black font-black text-lg py-4 mt-4 rounded-xl shadow-[6px_6px_0px_rgba(185,255,102,1)] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(185,255,102,1)] disabled:bg-gray-800 disabled:shadow-none transition-all"
+            className="w-full flex items-center justify-center bg-[#f38ba8] text-[#111818] font-bold py-3 mt-6 rounded-lg hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {isLoading ? <Loader2 className="animate-spin mr-2" size={24} /> : (isLogin ? 'Enter' : 'Create Account')}
+            {isLoading ? <Loader2 className="animate-spin mr-2" size={20} /> : (isLogin ? 'Authenticate' : 'Initialize')}
           </button>
         </form>
 

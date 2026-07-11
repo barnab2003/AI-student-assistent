@@ -318,19 +318,6 @@ const Dashboard = () => {
     // 1. Main Wrapper: Deep slate background, monospace font, full height, no scrolling on the body
     <div className="flex h-screen bg-[#1a2322] font-mono text-[#bac2de] overflow-hidden">
       
-      {/* 2. Mobile Header (Only visible on small screens) */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#111818] border-b border-[#313244] flex items-center justify-between px-4 z-50">
-        <div className="flex items-center gap-2">
-           <div className="text-[#f38ba8] text-xl font-bold font-sans">▲ 10xCS</div>
-        </div>
-        <button 
-          onClick={toggleSidebar}
-          className="text-[#bac2de] hover:text-[#f38ba8] transition-colors"
-        >
-          {/* You can use your preferred icon library here. Example uses simple text if icons aren't imported */}
-          {isSidebarOpen ? 'Close ✕' : 'Menu ☰'}
-        </button>
-      </div>
 
       {/* 3. The Sidebar Overlay for Mobile (Clicking outside closes it) */}
       {isSidebarOpen && (

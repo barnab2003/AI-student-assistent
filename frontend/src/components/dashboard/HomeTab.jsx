@@ -35,124 +35,148 @@ const HomeTab = ({
   ];
 
   return (
-    <div className="space-y-12 pb-8">
+    <div className="space-y-10 pb-8 font-mono text-[#bac2de]">
       
       {/* --- TOP SECTION: DASHBOARD WIDGETS --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* User Stats & Profile Widget */}
-        <div className="bg-[#191A23] p-8 rounded-[2rem] border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col items-center relative text-white">
+        <div className="bg-[#111818] p-8 rounded-2xl border border-[#313244] shadow-lg flex flex-col items-center relative text-[#bac2de]">
           {!isEditingProfile ? (
             <>
-              <button onClick={() => { setEditProfileData({ username: user?.username, file: null }); setIsEditingProfile(true); }} className="absolute top-6 right-6 text-gray-300 hover:text-[#B9FF66] transition-colors">
-                <Edit2 size={20} />
+              <button 
+                onClick={() => { setEditProfileData({ username: user?.username, file: null }); setIsEditingProfile(true); }} 
+                className="absolute top-4 right-4 text-[#bac2de]/60 hover:text-[#f38ba8] transition-colors p-2"
+              >
+                <Edit2 size={18} />
               </button>
               
-              <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-black font-black text-4xl mb-5 overflow-hidden border-4 border-[#B9FF66] shrink-0">
-                {user?.profilePicture ? <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" /> : user?.username?.charAt(0).toUpperCase()}
+              <div className="w-28 h-28 bg-[#1a2322] rounded-full flex items-center justify-center text-[#89dceb] font-bold text-4xl mb-5 overflow-hidden border border-[#313244] shrink-0">
+                {user?.profilePicture ? (
+                  <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  user?.username?.charAt(0).toUpperCase()
+                )}
               </div>
               
-              <div className="text-sm font-bold text-black bg-[#B9FF66] px-4 py-1.5 rounded-full mb-3">Level {user?.level || 1}</div>
-              <h3 className="text-2xl font-bold truncate max-w-full">{user?.username}</h3>
+              <div className="text-xs font-semibold text-[#89dceb] bg-[#1a2322] border border-[#313244] px-4 py-1 rounded-md mb-3">
+                Level {user?.level || 1}
+              </div>
+              <h3 className="text-xl font-bold truncate max-w-full text-white">{user?.username}</h3>
             </>
           ) : (
             <form onSubmit={handleUpdateProfile} className="w-full space-y-5 text-center">
-              <div className="relative w-24 h-24 mx-auto bg-gray-800 rounded-full flex items-center justify-center overflow-hidden border-2 border-[#B9FF66]">
+              <div className="relative w-24 h-24 mx-auto bg-[#1a2322] rounded-full flex items-center justify-center overflow-hidden border border-[#f38ba8]">
                 {editProfileData.file ? (
                   <img src={URL.createObjectURL(editProfileData.file)} alt="Preview" className="w-full h-full object-cover" />
                 ) : user?.profilePicture ? (
                   <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <Camera className="text-gray-400" size={32} />
+                  <Camera className="text-[#bac2de]/50" size={32} />
                 )}
                 <input type="file" accept="image/*" onChange={(e) => setEditProfileData({...editProfileData, file: e.target.files[0]})} className="absolute inset-0 opacity-0 cursor-pointer" />
               </div>
-              <p className="text-xs text-gray-400">Tap to change picture</p>
-              <input type="text" value={editProfileData.username} onChange={(e) => setEditProfileData({...editProfileData, username: e.target.value})} className="w-full p-2 border-2 border-[#B9FF66] bg-transparent text-white rounded-lg text-center outline-none focus:ring-2 focus:ring-[#B9FF66]" placeholder="New Username" required />
-              <div className="flex space-x-2 justify-center">
-                <button type="submit" className="bg-[#B9FF66] text-black border-2 border-black px-4 py-2 rounded-lg text-sm font-bold shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-none transition-all">Save</button>
-                <button type="button" onClick={() => setIsEditingProfile(false)} className="bg-gray-700 text-white border-2 border-black px-4 py-2 rounded-lg text-sm font-bold shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-none transition-all">Cancel</button>
+              <p className="text-xs text-[#bac2de]/50">Tap to change picture</p>
+              
+              <input 
+                type="text" 
+                value={editProfileData.username} 
+                onChange={(e) => setEditProfileData({...editProfileData, username: e.target.value})} 
+                className="w-full p-3 border border-[#313244] bg-[#1a2322] text-[#bac2de] rounded-lg text-center outline-none focus:border-[#f38ba8] focus:ring-1 focus:ring-[#f38ba8] transition-all" 
+                placeholder="New Username" 
+                required 
+              />
+              
+              <div className="flex space-x-3 justify-center">
+                <button type="submit" className="bg-[#f38ba8] text-[#111818] px-5 py-2 rounded-lg text-sm font-bold hover:bg-opacity-90 transition-all">Save</button>
+                <button type="button" onClick={() => setIsEditingProfile(false)} className="bg-[#1a2322] text-[#bac2de] border border-[#313244] px-5 py-2 rounded-lg text-sm font-semibold hover:bg-[#313244]/50 transition-all">Cancel</button>
               </div>
             </form>
           )}
 
-          <div className="flex w-full justify-between mt-8 px-6 pt-6 border-t border-gray-700">
+          <div className="flex w-full justify-between mt-8 px-4 pt-6 border-t border-[#313244]">
             <div className="text-center">
-              <Trophy className="mx-auto text-[#B9FF66] mb-2" size={24} />
-              <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Total XP</p>
-              <p className="font-black text-xl">{user?.xp || 0}</p>
+              <Trophy className="mx-auto text-[#f38ba8] mb-2" size={20} />
+              <p className="text-[10px] text-[#89dceb] uppercase font-bold tracking-wider">Total XP</p>
+              <p className="font-bold text-lg text-white">{user?.xp || 0}</p>
             </div>
             <div className="text-center">
-              <Flame className="mx-auto text-[#B9FF66] mb-2" size={24} />
-              <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Streak</p>
-              <p className="font-black text-xl">{user?.streak || 0} Days</p>
+              <Flame className="mx-auto text-[#f38ba8] mb-2" size={20} />
+              <p className="text-[10px] text-[#89dceb] uppercase font-bold tracking-wider">Streak</p>
+              <p className="font-bold text-lg text-white">{user?.streak || 0} Days</p>
             </div>
           </div>
         </div>
 
         {/* GitHub-Style Activity Calendar */}
-        <div className="md:col-span-2 bg-white p-8 rounded-[2rem] border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col justify-center overflow-x-auto">
-          <div className="flex justify-between items-end mb-6 border-b-4 border-black pb-3">
-            <h3 className="text-2xl font-black text-black tracking-tight">Contribution Graph</h3>
-            <span className="text-sm font-bold text-gray-500">Last 365 Days</span>
+        <div className="md:col-span-2 bg-[#111818] p-8 rounded-2xl border border-[#313244] shadow-lg flex flex-col justify-center overflow-x-auto">
+          <div className="flex justify-between items-end mb-6 border-b border-[#313244] pb-4">
+            <h3 className="text-xl font-bold text-white tracking-tight">Contribution Graph</h3>
+            <span className="text-xs font-semibold text-[#89dceb]">Last 365 Days</span>
           </div>
           <div className="mt-2 min-w-max">
             <ActivityCalendar 
               data={roadmap?.dailyActivityLog?.length > 0 ? roadmap.dailyActivityLog : [{ date: new Date().toISOString().split('T')[0], count: 0, level: 0 }]} 
-              // Authentic GitHub Green Theme
-              theme={{ light: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'] }} 
-              blockSize={16}
-              blockRadius={4}
-              blockMargin={5}
-              fontSize={14}
+              // Custom Cyber-Zen Cyan Theme
+              theme={{ 
+                light: ['#1a2322', '#203635', '#2c5957', '#428f8c', '#89dceb'],
+                dark: ['#1a2322', '#203635', '#2c5957', '#428f8c', '#89dceb'] 
+              }} 
+              blockSize={14}
+              blockRadius={3}
+              blockMargin={4}
+              fontSize={12}
             />
           </div>
         </div>
       </div>
 
       {/* --- MIDDLE SECTION: INFO BLOCKS --- */}
-      <div className="bg-white p-10 rounded-[2rem] border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]">
+      <div className="bg-[#111818] p-8 md:p-10 rounded-2xl border border-[#313244] shadow-lg">
         <div className="text-center mb-10">
-          <h2 className="text-4xl font-black text-black tracking-tight mb-4">Why Use <span className="text-[#B9FF66] bg-black px-3 py-1 rounded-xl shadow-[4px_4px_0px_rgba(185,255,102,1)]">SmartStudy?</span></h2>
-          <p className="text-gray-600 font-bold text-lg max-w-2xl mx-auto">The ultimate platform designed to turn your long-term coding goals into actionable, daily habits.</p>
+          <h2 className="text-3xl font-bold text-white tracking-tight mb-4">
+            Why Use <span className="text-[#f38ba8]">10xCS?</span>
+          </h2>
+          <p className="text-[#bac2de]/70 text-sm max-w-2xl mx-auto">
+            The ultimate self-hosted interface designed to turn your long-term coding goals into actionable, daily habits.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {infoBlocks.map((block, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-2xl border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:-translate-y-2 hover:shadow-[8px_8px_0px_rgba(0,0,0,1)] transition-all flex flex-col items-start">
-              <div className={`p-4 rounded-xl border-2 border-black ${block.color} shadow-[2px_2px_0px_rgba(0,0,0,1)] mb-6`}>
-                <block.icon size={32} className="text-black" strokeWidth={2.5} />
+            <div key={idx} className="bg-[#1a2322] p-6 rounded-xl border border-[#313244] shadow-md hover:border-[#89dceb]/50 hover:-translate-y-1 transition-all flex flex-col items-start group">
+              <div className="p-3 rounded-lg border border-[#313244] bg-[#111818] mb-5 text-[#89dceb] group-hover:text-[#f38ba8] transition-colors">
+                <block.icon size={24} strokeWidth={2} />
               </div>
-              <h4 className="text-xl font-black text-black mb-3">{block.title}</h4>
-              <p className="text-gray-600 font-medium leading-relaxed">{block.desc}</p>
+              <h4 className="text-lg font-bold text-white mb-2">{block.title}</h4>
+              <p className="text-[#bac2de]/70 text-sm leading-relaxed">{block.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* --- BOTTOM SECTION: FOOTER --- */}
-      <footer className="bg-[#191A23] p-10 rounded-[2rem] border-2 border-black shadow-[6px_6px_0px_rgba(0,0,0,1)] text-white mt-12 flex flex-col md:flex-row justify-between items-center gap-8">
+      <footer className="bg-[#111818] p-8 md:p-10 rounded-2xl border border-[#313244] shadow-lg text-[#bac2de] mt-10 flex flex-col md:flex-row justify-between items-center gap-6">
         
         {/* Brand & Copyright */}
         <div className="text-center md:text-left space-y-2">
-          <div className="flex items-center justify-center md:justify-start space-x-2 font-black text-2xl tracking-tight mb-2">
-            <span className="text-3xl text-[#B9FF66] drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"></span>
-            <span>10x.CS</span>
+          <div className="flex items-center justify-center md:justify-start space-x-2 font-bold text-2xl font-sans tracking-tight mb-1">
+            <span className="text-[#f38ba8]">▲ 10xCS</span>
           </div>
-          <p className="text-gray-400 font-medium text-sm">© {new Date().getFullYear()} SmartStudy. All rights reserved.</p>
-          <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">Built for the next generation of engineers.</p>
+          <p className="text-[#bac2de]/50 text-xs">© {new Date().getFullYear()} 10xCS. All rights reserved.</p>
+          <p className="text-[#89dceb] text-[10px] uppercase tracking-widest mt-1">Yours for the voyage.</p>
         </div>
 
         {/* Social Links */}
         <div className="flex space-x-4">
-          <a href="#" title="GitHub" className="p-3 bg-white text-black border-2 border-black rounded-full hover:bg-[#B9FF66] hover:-translate-y-1 shadow-[2px_2px_0px_rgba(0,0,0,1)] transition-all">
-            <Code size={20} strokeWidth={2.5} />
+          <a href="#" title="GitHub" className="p-3 bg-[#1a2322] text-[#89dceb] border border-[#313244] rounded-lg hover:border-[#f38ba8] hover:text-[#f38ba8] transition-all">
+            <Code size={18} />
           </a>
-          <a href="#" title="Community Discord/Twitter" className="p-3 bg-white text-black border-2 border-black rounded-full hover:bg-[#FF90E8] hover:-translate-y-1 shadow-[2px_2px_0px_rgba(0,0,0,1)] transition-all">
-            <MessageCircle size={20} strokeWidth={2.5} />
+          <a href="#" title="Community" className="p-3 bg-[#1a2322] text-[#89dceb] border border-[#313244] rounded-lg hover:border-[#f38ba8] hover:text-[#f38ba8] transition-all">
+            <MessageCircle size={18} />
           </a>
-          <a href="#" title="Contact Us" className="p-3 bg-white text-black border-2 border-black rounded-full hover:bg-[#FFC900] hover:-translate-y-1 shadow-[2px_2px_0px_rgba(0,0,0,1)] transition-all">
-            <Mail size={20} strokeWidth={2.5} />
+          <a href="#" title="Contact" className="p-3 bg-[#1a2322] text-[#89dceb] border border-[#313244] rounded-lg hover:border-[#f38ba8] hover:text-[#f38ba8] transition-all">
+            <Mail size={18} />
           </a>
         </div>
         

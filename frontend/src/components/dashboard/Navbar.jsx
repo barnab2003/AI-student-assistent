@@ -4,36 +4,43 @@ import logo from '../../assets/logo.png';
 
 const Navbar = ({ activeTab, setActiveTab, toggleSidebar }) => { // <--- ADD toggleSidebar HERE
   return (
-    <nav className="bg-white border-b-2 border-black sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex justify-between items-center h-20">
+    <nav className="bg-[#111818] border-b border-[#313244] sticky top-0 z-50 font-mono text-[#bac2de]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
         
         {/* Hamburger Menu & Brand Logo */}
-        <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
+        <div className="flex items-center space-x-4 shrink-0">
           
-          <button onClick={toggleSidebar} className="p-2 sm:p-2.5 bg-white border-2 border-black rounded-xl shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer">
-            <Menu size={24} className="text-black" strokeWidth={2.5} />
+          {/* Mobile Hamburger (Hidden on desktop since sidebar is fixed) */}
+          <button 
+            onClick={toggleSidebar} 
+            className="md:hidden p-2 text-[#bac2de] hover:text-[#f38ba8] transition-colors cursor-pointer rounded-lg hover:bg-[#1a2322]"
+          >
+            <Menu size={24} />
           </button>
 
-          <div className="flex items-center space-x-3 font-black text-2xl tracking-tight text-black cursor-pointer">
-            <img 
-              src={logo} 
-              alt="SmartStudy Logo" 
-              className="h-8 sm:h-10 w-auto" 
-            />
-            <span className="hidden sm:block">10x.CS</span>
+          <div className="flex items-center space-x-3 font-bold text-xl tracking-tight cursor-pointer">
+            {/* Optional: Keep your image logo, or just use the styled text */}
+            {logo && (
+              <img 
+                src={logo} 
+                alt="10xCS Logo" 
+                className="h-8 w-auto opacity-90 hidden sm:block" 
+              />
+            )}
+            <span className="text-[#f38ba8] font-sans text-2xl">▲ 10xCS</span>
           </div>
         </div>
         
-        {/* Navigation Tabs - Adds horizontal scroll for small screens */}
+        {/* Navigation Tabs */}
         <div className="flex space-x-2 sm:space-x-3 overflow-x-auto no-scrollbar py-2 px-1">
           {['home', 'roadmap', 'community'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold text-xs sm:text-sm capitalize transition-all border-2 shrink-0 ${
+              className={`px-4 py-2 rounded-lg font-semibold text-sm capitalize transition-all border shrink-0 ${
                 activeTab === tab 
-                  ? 'bg-[#B9FF66] border-black text-black shadow-[3px_3px_0px_rgba(0,0,0,1)]' 
-                  : 'bg-white border-transparent text-gray-600 hover:border-black hover:shadow-[3px_3px_0px_rgba(0,0,0,1)]'
+                  ? 'bg-[#1a2322] border-[#313244] text-[#89dceb] shadow-sm' 
+                  : 'bg-transparent border-transparent text-[#bac2de] hover:text-[#f38ba8] hover:bg-[#1a2322]/50'
               }`}
             >
               {tab}
