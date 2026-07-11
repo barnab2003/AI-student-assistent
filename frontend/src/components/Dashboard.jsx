@@ -13,7 +13,7 @@ import QuizTab from './dashboard/QuizTab';
 import axios from 'axios';
 import BadgesTab from './dashboard/BadgesTab';
 import { uploadImageToCloudinary } from '../utils/uploadImage';
-
+import { Menu } from 'lucide-react';
 const Dashboard = () => {
   // --- 1. STATE VARIABLES ---
   const [roadmap, setRoadmap] = useState(null);
@@ -317,7 +317,17 @@ const Dashboard = () => {
   return (
   // 1. Main Wrapper: Deep slate background, monospace font, full height, no scrolling on the body
     <div className="flex h-screen bg-[#1a2322] font-mono text-[#bac2de] overflow-hidden">
-      
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#111818] border-b border-[#313244] flex items-center justify-between px-4 z-50">
+      <div className="flex items-center gap-2">
+         <div className="text-[#f38ba8] text-xl font-bold font-sans">▲ 10xCS</div>
+      </div>
+      <button 
+        onClick={toggleSidebar} 
+        className="text-[#bac2de] hover:text-[#f38ba8] transition-colors p-1"
+      >
+        <Menu size={28} />
+      </button>
+    </div>
 
       {/* 3. The Sidebar Overlay for Mobile (Clicking outside closes it) */}
       {isSidebarOpen && (
